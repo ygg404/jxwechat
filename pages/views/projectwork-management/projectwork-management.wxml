@@ -1,0 +1,126 @@
+<!--pages/views/projectwork-management/projectwork-management.wxml-->
+<!-- 菜单窗口 -->
+<menu-component urlId="{{urlId}}"></menu-component>
+<calendar-component dateInfo="{{dateInfo}}" wx:if="{{calendarShow}}" bindshowEvent="CalendarEvent" bindsetEvent="CalendarEvent"></calendar-component>
+
+<view class='mycontain'>
+  <view class='box'>
+    <view class='spaceAroundCenter'>
+      <view style='width:45%;' >
+        <input placeholder="开始日期" disabled='true' value='{{pagination.startDate}}' bindtap='setStartDateEvent' class='inputdate'></input>
+      </view>
+      -
+      <view style='width:45%;' >
+        <input placeholder="结束日期" disabled='true' value='{{pagination.endDate}}' bindtap='setEndDateEvent' class='inputdate'></input>
+      </view>
+    </view>
+  </view>
+  <view class='spaceAroundCenter' >
+     <view class='searchview'>
+      <picker bindchange="ProTypeChangeEvent"   value="{{projectTypeID}}" range="{{projectTypes}}">
+        <view style='width:200%;'>
+          {{projectTypes[projectTypeID]}}
+        </view>
+        <!-- <icon type='download'   ></icon> -->
+      </picker>
+      <image src='/images/down.png'></image>
+    </view>
+    <view class='searchview' >
+      <input class='inputsearch' placeholder='关键词搜索' bindinput="searchInputEvent" value='{{pagination.search}}'></input>
+      <icon type='search' style='margin-left:-32px;margin-top:15rpx;'></icon>
+    </view>
+
+  <view class="table">
+      <view class="tr">
+          <view class='th0'></view>
+          <view class="th th1">合同编号</view>
+          <view class="th th2">合同名称</view>
+          <view class="th th3">操作</view>
+      </view>
+      <view wx:for="{{tableList}}" wx:for-item="project" >
+        <view class="tr" >
+            <view class='td0'>{{project.selected?'v':'>'}}</view>
+            <view class="td td1" bindtap='detailClickEvent' id="{{project.id}}">{{project.contractNo==null?'':project.contractNo}}</view>
+            <view class="td td2">{{project.projectName}}</view>
+            <view class="td td3">
+              <view><button class='resbtn' bindtap='editClickEvent' id="{{project.id}}">编辑</button></view>
+              <view><button class='resbtn' bindtap='saveClickEvent' id="{{project.id}}">修改状态</button></view>
+              <view><button class='resbtn' wx:if='{{project.backWorkList!=null}}' bindtap='backClickEvent' id="{{project.id}}">返修</button></view>
+            </view>
+        </view>
+        <view wx:if="{{project.selected}}">
+          <view class='tr detail'><text>项目负责人：</text><text>{{project.projectCharge}}</text></view>
+          <view class='tr detail'><text>委托单位：</text><text>{{project.projectAuthorize}}</text></view>
+          <view class='tr detail'><text>项目状态：</text><text>{{project.workStage == 0? "开始" : "暂停"}}</text></view>
+          <view class='tr detail'><text>项目类型：</text><text>{{project.projectType}}</text></view>
+          <view class='tr detail'><text>项目阶段：</text><text>{{project.projectStage}}</text></view>
+          <view class='tr detail'><text>启动时间：</text><text>{{project.projectStartTime}}</text></view>
+        </view>
+      </view>
+      <view class="tr">
+          <button class="{{has_pre?'btnfont_has':'btnfont_no'}}" disabled="{{has_pre?false:true}}" bindtap='prePage' >上一页</button>
+          <text class='trtext'>第{{pagination.page}}页</text>
+          <button class="{{has_next?'btnfont_has':'btnfont_no'}}" disabled="{{has_next?false:true}}" bindtap='nextPage'>下一页</button>
+      </view>
+    </view>
+
+  </view>
+</view>
+
+
+<view wx:if="{{backShow}}">
+  <view class='drawer_screen'></view>
+  <view class='form'>
+    <view class='tabledetail' >
+      <view class='tr'>
+        <text style='padding:20rpx;' class='title'>项目返修内容</text>
+      </view>
+      <view class='tr' >
+          <view class="tdh tdh1">返修日期</view>
+          <view class="tdh tdh2">返修内容</view>
+          <view class="tdh tdh3">提交内容</view>
+          <view class="tdh tdh4"></view>
+      </view>
+         <view class="tr" wx:for="{{curPro.backWorkList}}" wx:for-item="detail">
+            <view class="tdd tdd1">{{detail.backcreatedtime}}</view>
+            <view class="tdd tdd2">{{detail.backNote}}</view>
+            <view class="tdd tdd3">{{detail.note == null?'':detail.note}}</view>
+            <view class="tdd tdd4"><button id='{{detail.id}}' bindtap='backEditEvent'>编辑</button></view>
+         </view>
+      <view class="tr" style='margin-top:40rpx;'>
+        <view></view>
+        <button bindtap='returnBackEvent' class='backResBtn'>取消</button>
+      </view>
+    </view>
+
+  </view>
+</view>
+
+<view wx:if="{{backEditShow}}">
+  <view class='back_screen'></view>
+  <view class='rform'>
+    <view class='tabledetail' >
+      <view class='tr' >
+        <view class='space'  >
+        <view class='searchview' >
+              <picker bindchange="rshotrcutChangeEvent"   value="{{rindex}}" range="{{rNameList}}">
+                <view style='width:200%;'>
+                  {{rNameList[rindex]}}
+                </view>
+                <!-- <icon type='download'   ></icon> -->
+              </picker>
+              <image src='/images/down.png'></image>
+        </view>
+        </view>
+      </view>
+      <view class='tr'>
+        <textarea placeholder='回复内容' value='{{executes}}' bindinput='executesInputEvent'></textarea>
+      </view>
+      <view class="tr" style='margin-top:40rpx;'>
+        <button bindtap='returnShortCutEvent' class='backResBtn'>取消</button>
+        <button bindtap='postShortCutEvent' class='backResBtn'>提交</button>
+      </view>
+    </view>
+
+  </view>
+</view>

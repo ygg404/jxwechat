@@ -1,0 +1,25 @@
+<!--pages/login/login.wxml-->
+<!-- 加载中窗口 -->
+<loading-component  wx:if="{{loadingShow}}" loadtxt="{{loadtxt}}"></loading-component>
+
+<view class='container'>
+  <view class='title'>
+    <text>测绘项目管理系统</text>
+  </view>
+  <form bindsubmit="formSubmit" class='formbody'>
+    <view class='layout'>
+      <view class='btninput'>
+          <input placeholder='账号' value="{{userAccount}}" data-name='userAccount' bindinput="userAccountInput"/>
+      </view>
+    </view>
+    <view class='layout'>
+        <view class='btninput'>
+          <input password='true' placeholder='密码' value="{{password}}" data-name='password' bindinput="passwordInput"/>
+        </view>
+    </view>
+    <view class='button'>
+      <button type='primary' form-type='submit' bindtap="loginTap">登录</button>
+    </view>
+  </form>
+</view>
+

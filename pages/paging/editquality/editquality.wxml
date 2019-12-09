@@ -1,0 +1,116 @@
+<!--pages/paging/editquality/editquality.wxml-->
+<view class='box'>
+  <view class='spaceAroundCenter'>
+    <view class="tr" bindtap='viewPtWorkEvent'>
+      <text>项目基本信息</text>
+      <image src="{{ptworkSelected ? '/images/tridown.png' :'/images/triup.png'}}"></image>
+    </view>
+    <view class="table"   wx:if="{{ptworkSelected}}">
+      <view class='tr detail'><text>项目名称：</text><text>{{ptwork.projectPlan.projectName}}</text></view>
+      <view class='tr detail'><text>上交资料：</text><text>{{ptwork.projectWork.dataName}}</text></view>
+      <view class='tr detail'><text>业务负责人：</text><text>{{ptwork.projectWork.projectBusiness}}</text></view>
+      <view class='tr detail'><text>委托单位：</text><text>{{ptwork.projectPlan.projectAuthorize}}</text></view>
+      <view class='tr detail'><text>委托要求：</text><text>{{ptwork.projectPlan.projectNote}}</text></view>
+      <view class='tr detail'><text>作业内容：</text><text>{{ptwork.projectPlan.projectWorkNote}}</text></view>
+      <view class='tr detail'><text>工作小结：</text><text>{{ptwork.projectWork.briefSummary}}</text></view>
+    </view>
+    <view class="tr" bindtap='viewBackEvent'>
+      <text>返修记录</text>
+      <image src="{{backSelected ? '/images/tridown.png' :'/images/triup.png'}}"></image>
+    </view>
+    <view class="table"  wx:if="{{backSelected}}">
+      <view wx:for="{{backList}}" wx:for-item="back" >
+        <view class="tr detail" style='font-size:10pt;'>
+          {{back.backNote}}
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
+
+<form style='width:100%;zIndex:1;' bindsubmit="formSubmit" bindreset="formReset" >
+<view class='box' wx:if="{{!addBackShow}}">
+  <view class='spaceAroundCenter'>
+    
+    <view class="tr">
+      <text>质量检查信息</text>
+    </view>
+
+    <view class='tr'>
+      <view class='select_box'>
+        <view class='select' catchtap='qshortChangeEvent'>
+            <text class='select_text'>质量综述快捷输入</text>
+            <image class='select_img' src='/images/down.png'  background-size="contain"></image> 
+        </view>
+      </view>
+    </view>
+
+    <view class="tr" wx:if='{{!qShortShow}}'>
+      <textarea maxlength='-1' placeholder='质量综述' name='qualityNote' value='{{qualityNote}}'></textarea>
+    </view>
+
+    <view class='tr' >
+      <input placeholder='内容评分' type='number' name='qualityScore' value='{{qualityScore}}' bindinput='qualityScoreEvent'
+       style='border-bottom:1px solid green;margin:20rpx;font-size:12pt;'></input>
+    </view>
+    <view class='tr'>
+      <button style='background:#0fdf1f;color:white;' bindtap='qualityScoreLoadEvent'>质量评分</button>
+    </view>
+  </view>
+</view>
+
+<view class='tr'>
+  <button class='returnbtn' bindtap='returnEvent'>返回</button>
+  <button class='savebtn' formType="submit">保存</button>
+  <button class='posttobtn' formType="submit" id='post'>提交至核算</button>
+  <button class='addbtn' bindtap='addEvent'>退回返修</button>
+</view>
+</form>
+
+
+<view wx:if="{{addBackShow}}">
+  <view class='drawer_screen'></view>
+  <view class='form'> 
+    <view class='tabledetail' >
+      <text class='title'>提出返修</text>
+      <view class='spaceAroundCenter' style='width:100%;margin-top:30rpx;'>
+        <view class='searchview'>
+          <picker bindchange="bshortChangeEvent"   value="{{bindex}}" range="{{bNameList}}">
+            <view style='width:200%;'>
+              {{bNameList[bindex]}}
+            </view>
+          </picker>
+          <image src='/images/down.png'></image>
+        </view>
+        <textarea value='{{backNote}}' bindinput='backNoteEvent' placeholder='请填写返修意见'></textarea>
+      </view>
+      <view class='tr'>
+        <button class='retbtn' bindtap='backReturnEvent'>取消</button>
+        <button class='postbtn' bindtap='postBackEvent'>提交</button>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- 质量综述快捷短语多选 -->
+<view wx:if="{{qShortShow}}">
+  <view class='drawer_screen'></view>
+  <view class='form'>
+    <view class='tabledetail'>
+      <view class='title'>质量综述快捷输入</view>
+      <view class='checkBox'>
+        <view class='tr'>
+          <checkbox-group bindchange="qShortCheckEvent">
+            <label wx:for="{{qshortcutList}}" wx:for-item="qshort" style='display:block;'>
+              <checkbox  value='{{qshort.id}}' checked="{{qshort.checked}}"/>{{qshort.shortNote}}
+            </label>
+          </checkbox-group>
+        </view>
+      </view>
+      <view class="tr" style='margin-top:20rpx;'>
+        <button class='returnbtn' bindtap='returnQshortEvent'>取消</button>
+        <button class='savebtn' bindtap='setQshortEvent'>确认</button>
+      </view>
+    </view>
+  </view>
+</view>

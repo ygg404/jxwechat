@@ -1,0 +1,6 @@
+{
+  "enablePullDownRefresh": false,
+  "usingComponents": {
+    "loading-component": "/pages/Components/loading-com/loading-com"
+  }
+}

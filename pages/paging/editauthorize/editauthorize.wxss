@@ -1,0 +1,139 @@
+/* pages/paging/editauthorize/editauthorize.wxss */
+.box{
+  margin:20rpx;
+  border: 1px solid #dadada
+}
+.boxinfo{
+  margin:20rpx;
+  background: #5f636b;
+  color: whitesmoke
+}
+.boxgroup{
+  margin: 20rpx;
+  background: #0ab133;
+  font-size: 10pt;
+  color: whitesmoke;
+}
+
+.spaceAroundCenter {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  justify-content: space-between;
+  line-height: 65rpx;
+  font-size: 16pt;
+}
+
+.spaceAroundCenter .inputdate{
+  height: 70rpx;
+  width: 100%;
+  text-align: center;
+  align-items: center;
+  border:1px solid rgb(40, 133, 4)
+}
+
+.spaceAroundCenter .inputsearch{
+  width: 95%;
+  height: 70rpx;
+  text-align: left;
+  align-items: center;
+  border-bottom:1px solid rgb(40, 133, 4)
+}
+
+.spaceAroundCenter .searchview{
+  width: 90%;
+  display: flex;
+  flex-flow: row wrap;
+  font-size: 13pt;
+}
+
+.spaceAroundCenter .searchview .addbtn{
+  width:66%;
+  background: #0ab133;
+  color: whitesmoke;
+}
+
+.spaceAroundCenter picker{
+  display: flex;
+  flex-flow: row wrap;
+  /* text-align: center; */
+  justify-content: flex-start;
+  /* padding-left: 10rpx; */
+  border-bottom: 1rpx solid rgb(40, 133, 4);
+  margin-left: 5%;
+  width: 90%;
+  font-size: 10pt;
+  color: grey;
+}
+
+.spaceAroundCenter image{
+  width: 30rpx;
+  height: 30rpx;
+  margin-left: -50rpx;
+  margin-top: 10rpx;
+}
+
+.spaceAroundCenter icon{
+  margin-left: -70rpx;
+  margin-top: 20rpx;
+  z-index: -1
+}
+
+.table{
+  border:1px solid #098305;
+  margin-top: 25rpx;
+  width: 98%;
+  margin-left: 1%;
+}
+
+.tr{
+  text-align: left;
+  width:100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.detail{
+  background: #dadada;
+  width: 100%;
+  font-size: 9pt;
+  text-align: left;
+  justify-content: flex-start;
+  word-break: normal; 
+}
+
+.tr textarea{
+  border: 1px solid #3fc40b;
+  font-size: 10pt;
+  width: 100%;
+}
+
+.btnLine{
+  width: 100%;
+  margin-top: 20rpx;
+  margin-bottom: 20rpx;
+}
+
+.rtbtn{
+  background: #e6ae15;
+  color: white;
+  font-size: 10pt;
+  line-height: 200%;
+  width: 25%;
+}
+
+.savebtn{
+  background: #3fc40b;
+  color: white;
+  font-size: 10pt;
+  line-height: 200%;
+  width: 25%;
+}
+
+.postbtn{
+  background: #36a2d4;
+  color: whitesmoke;
+  font-size: 10pt;
+  line-height: 200%;
+  width: 25%;
+}
