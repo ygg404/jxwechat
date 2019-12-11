@@ -13,9 +13,9 @@ const requestUrl = ({
   let sessionId = wx.getStorageSync("sid"),
     that = this;
   if (sessionId != "" && sessionId != null) {
-    var header = { 'content-type': 'application/x-www-form-urlencoded', 'Cookie': 'sid=' + sessionId,'token': app.globalData.token }
+    var header = { 'Cookie': 'sid=' + sessionId,'token': app.globalData.token }
   } else {
-    var header = { 'content-type': 'application/x-www-form-urlencoded', 'token': app.globalData.token }
+    var header = {  'token': app.globalData.token }
   }
   return new Promise(function (resolve, reject) {
     wx.request({
