@@ -1,5 +1,6 @@
 // pages/views/allocation-management/allocation-management.js
 var utils = require('../../../utils/util.js');
+var httpRequest = require('../../../utils/httpRequest.js');
 var app = getApp();
 
 Page({
@@ -17,7 +18,7 @@ Page({
     pagination: {
       'page': 1,
       'rowsPerPage': 10,
-      'sortBy': 'id',
+      'sidx': 'id',
       'startDate': utils.getLastMonthDate(), //开始日期
       'endDate': utils.formatDate(new Date()),// 结束日期
       'search': '',
@@ -48,7 +49,7 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
-    this.getProjectTypesInfo();
+    // this.getProjectTypesInfo();
     this.getProjectsFromApi();
   },
 
@@ -103,44 +104,31 @@ Page({
     })
   },
   /**
-   * 合同管理列表
+   * 项目管理列表
    */
   getProjectsFromApi: function () {
-    var pagination = this.data.pagination;
     var that = this;
-    wx.request({
-      url: app.globalData.WebUrl + "projectSetUp/",
-      method: 'GET',
-      data: {
-        page: pagination.page,
-        rowsPerPage: pagination.rowsPerPage,
-        sortBy: pagination.sortBy,
-        descending: pagination.descending,
-        search: pagination.search,
-        startDate: pagination.startDate,
-        endDate: pagination.endDate,
-        p_stage: pagination.p_stage,
-        stageId: pagination.stageId,
-        account: ''
+    httpRequest.requestUrl({
+      url: "/project/manage/page",
+      params: {
+        page: that.data.pagination.page,
+        limit: that.data.pagination.rowsPerPage,
+        key: that.data.pagination.search, 
+        sidx: that.data.pagination.sidx,
+        order: 'desc',
+        startDate: that.data.pagination.startDate,
+        endDate: that.data.pagination.endDate,
+        dateItemId: 0
       },
-      // 设置请求的 header  
-      header: {
-        'Authorization': "Bearer " + app.globalData.SignToken
-      },
-      success: function (res) {
-        if (res.statusCode == 200) {
-          utils.tableListInit(res.data['data']);
-          that.setData({
-            has_next: res.data.has_next,  //是否有上下页
-            has_pre: res.data.has_prev,
-            tableList: res.data['data']
-          });
-        }
-
-      },
-      fail: function (res) {
-
-      }
+      method: "get"
+    }).then(data => {
+      let hasPre = data.page.currPage > 1 && data.page.currPage <= data.page.totalPage
+      let hasNext = data.page.currPage < data.page.totalPage
+      that.setData({
+        tableList : data.page.list,
+        has_next: hasNext,  //是否有上下页
+        has_pre: hasPre,
+      })
     })
   },
 

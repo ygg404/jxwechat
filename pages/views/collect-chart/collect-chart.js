@@ -154,7 +154,7 @@ Page({
           console.log(projectSum)
           that.setData({
             tableList: res.data.list,
-            outPutNumSum: outPutNumSum,
+            outPutNumSum: outPutNumSum.toFixed(2),
             projectSum: projectSum
           });
         }

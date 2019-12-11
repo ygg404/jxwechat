@@ -1,4 +1,5 @@
 // pages/paging/editallocation/editallocation.js
+var httpRequest = require('../../../utils/httpRequest.js');
 var utils = require('../../../utils/util.js');
 var app = getApp();
 
@@ -16,13 +17,13 @@ Page({
     wshortcutList: [],//作业内容快捷短语
     wShortShow: false, 
     tshortcutList :[], //技术要求快捷短语
-    tShortShow:false,
-    projectDetail:{},  //项目基本信息
-    alloItem:{}, //项目安排信息
+    tShortShow:false,    
     workGroupsList: [], //作业组列表
     workGroupShow: false,
     headManList:[],  //项目负责人列表
-    headManIndex:0     
+    headManIndex:0,
+    projectInfo: '', //项目基本信息
+    projectPlan: {}, //项目安排信息     
   },
 
   /**
@@ -114,6 +115,8 @@ Page({
     this.wxValidateInit();
     
     this.getProjectInfo();
+    this.getProjectPlan();
+    this.getWorkGroups();
     this.getShortCutList();
   },
 
@@ -155,11 +158,12 @@ Page({
       })
       return;
     }
-
+    let projectPlan = this.data.projectPlan
+    projectPlan.projectBegunDateTime = e.detail.dateInfo
     if (e.type == 'setEvent') {
       this.setData({
         dateShow: false,
-        projectBegunDate: e.detail.dateInfo
+        projectPlan: projectPlan
       })
     }
   },
@@ -176,122 +180,122 @@ Page({
  */
   getWorkGroups: function () {
     var that = this;
-    wx.request({
-      url: app.globalData.WebUrl + "workGroups/" ,
-      method: 'GET',
-      header: {
-        'Authorization': "Bearer " + app.globalData.SignToken
-      },
-      success: function (res) {
-        let manList = [];
-        if (res.statusCode == 200) {
-          for(let group of res.data){
-            group['checked'] = false;
-            for(let rate of that.data.projectDetail.rateList){
-              if (rate['group_id'] == group['id']){
-                group['output_rate'] = rate['output_rate'];
-                group['project_output'] = rate['project_output'];
-                group['shortDate'] = rate['shortDate'];
-                group['lastDate'] = rate['lastDate'];
-                group['checked'] = true;
-                manList.push(group['headMan']);
-              }
-            }
+    httpRequest.requestUrl({
+      url: "/project/group/getListByProjectNo/" + that.data.p_no,
+      params: {},
+      method: "get"
+    }).then(data => {
+      that.setData({
+        workGroupsList: data.list,
+      })
+    })
+    // wx.request({
+    //   url: app.globalData.WebUrl + "workGroups/" ,
+    //   method: 'GET',
+    //   header: {
+    //     'Authorization': "Bearer " + app.globalData.SignToken
+    //   },
+    //   success: function (res) {
+    //     let manList = [];
+    //     if (res.statusCode == 200) {
+    //       for(let group of res.data){
+    //         group['checked'] = false;
+    //         for(let rate of that.data.projectDetail.rateList){
+    //           if (rate['group_id'] == group['id']){
+    //             group['output_rate'] = rate['output_rate'];
+    //             group['project_output'] = rate['project_output'];
+    //             group['shortDate'] = rate['shortDate'];
+    //             group['lastDate'] = rate['lastDate'];
+    //             group['checked'] = true;
+    //             manList.push(group['headMan']);
+    //           }
+    //         }
             
-          }
+    //       }
 
-          let index = manList.indexOf(that.data.projectDetail.projectCharge);
-          that.setData({
-            workGroupsList: res.data,
-            headManList: manList,
-            headManIndex: index
-          });
-        }
-      }
-    });
+    //       let index = manList.indexOf(that.data.projectDetail.projectCharge);
+    //       that.setData({
+    //         workGroupsList: res.data,
+    //         headManList: manList,
+    //         headManIndex: index
+    //       });
+    //     }
+    //   }
+    // });
   },
   /**
  * 通过项目编号 获取项目基本信息
  */
   getProjectInfo: function () {
     var that = this;
-    wx.request({
-      url: app.globalData.WebUrl + "projectPlan/?projectNo=" + that.data.p_no,
-      method: 'GET',
-      header: {
-        'Authorization': "Bearer " + app.globalData.SignToken
-      },
-      success: function (res) {
-        if (res.statusCode == 201) { 
-          that.setData({
-            projectDetail: res.data,
-            projectBegunDate: res.data.projectBegunDate == null ? '' : res.data.projectBegunDate.replace(' 00:00:00','')
-            
-        });
-          that.getWorkGroups();
-      }
-      }
-    });
+    httpRequest.requestUrl({
+      url: "/project/projectInfo/info/" + that.data.p_no,
+      params: {},
+      method: "get"
+    }).then(data => {
+      that.setData({
+        projectInfo: data.projectInfo,
+      })
+    })
   },
-
+  /**
+ * 通过项目编号 获取项目安排信息
+ */
+  getProjectPlan: function () {
+    var that = this;
+    httpRequest.requestUrl({
+      url: "/project/plan/info/" + that.data.p_no,
+      params: {},
+      method: "get"
+    }).then(data => {
+      that.setData({
+        projectPlan: data.projectPlan,
+      })
+    })
+  },
   /**
    * 获取快捷短语
    */
   getShortCutList: function () {
     var that = this;
-    wx.request({
-      url: app.globalData.WebUrl + "shortcut/1/",
-      method: 'GET',
-      header: {
-        'Authorization': "Bearer " + app.globalData.SignToken
-      },
-      success: function (res) {
-        if (res.statusCode == 200) {
-          for(let shortcut of res.data){
-            shortcut.checked = false;
-          }
-          that.setData({
-            zshortcutList: res.data,
-          })
-        }
+    httpRequest.requestUrl({
+      url: "/set/wpshortcut/getListByShortTypeId/1",
+      params: {},
+      method: "get"
+    }).then(data => {
+      for (let shortcut of data.list) {
+        shortcut.checked = false;
       }
-    });
+      that.setData({
+        zshortcutList: data.list,
+      })
+    })
 
-    wx.request({
-      url: app.globalData.WebUrl + "shortcut/3/",
-      method: 'GET',
-      header: {
-        'Authorization': "Bearer " + app.globalData.SignToken
-      },
-      success: function (res) {
-        if (res.statusCode == 200) {
-          for (let shortcut of res.data) {
-            shortcut.checked = false;
-          }
-          that.setData({
-            wshortcutList: res.data,
-          })
-        }
+    httpRequest.requestUrl({
+      url: "/set/wpshortcut/getListByShortTypeId/3",
+      params: {},
+      method: "get"
+    }).then(data => {
+      for (let shortcut of data.list) {
+        shortcut.checked = false;
       }
-    });
+      that.setData({
+        wshortcutList: data.list,
+      })
+    })
 
-    wx.request({
-      url: app.globalData.WebUrl + "shortcut/4/",
-      method: 'GET',
-      header: {
-        'Authorization': "Bearer " + app.globalData.SignToken
-      },
-      success: function (res) {
-        if (res.statusCode == 200) {
-          for (let shortcut of res.data) {
-            shortcut.checked = false;
-          }
-          that.setData({
-            tshortcutList: res.data
-          })
-        }
+    httpRequest.requestUrl({
+      url: "/set/wpshortcut/getListByShortTypeId/4",
+      params: {},
+      method: "get"
+    }).then(data => {
+      for (let shortcut of data.list) {
+        shortcut.checked = false;
       }
-    });
+      that.setData({
+        tshortcutList: data.list,
+      })
+    })
   },
   /**
    * 预计产值算工期
@@ -319,12 +323,12 @@ Page({
     }
     console.log(project_workDate);
     console.log(project_qualityDate);
-    let projectDetail = this.data.projectDetail;
-    projectDetail['projectOutPut'] = project_output;
-    projectDetail['projectWorkDate'] = project_workDate;
-    projectDetail['projectQualityDate'] = project_qualityDate;
+    let projectPlan = this.data.projectPlan;
+    projectPlan['projectOutput'] = e.detail.value;
+    projectPlan['projectWorkDate'] = project_workDate;
+    projectPlan['projectQualityDate'] = project_qualityDate;
     this.setData({
-      projectDetail: projectDetail
+      projectPlan: projectPlan
     })
 
   },
@@ -368,16 +372,16 @@ Page({
    * 执行标准短语输入确定
    */
   setZshortEvent:function(e){
-    let pDetail = this.data.projectDetail;
+    let pDetail = this.data.projectPlan;
     let projectExecuteStandard = '';
     for(let execute of this.data.zshortcutList){
       if(execute.checked){
-        projectExecuteStandard += execute.shortNote + ';';
+        projectExecuteStandard += execute.shortcutNote + ';';
       }
     }
-    pDetail['projectExecuteStandard'] = projectExecuteStandard;
+    pDetail['executeStandard'] = projectExecuteStandard;
     this.setData({
-      projectDetail: pDetail,
+      projectPlan: pDetail,
       zShortShow:false
     });
   },
@@ -433,16 +437,16 @@ Page({
    * 作业内容确定
    */
   setWshortEvent:function(e){
-    let pDetail = this.data.projectDetail;
+    let pDetail = this.data.projectPlan;
     let projectWorkNote = '';
     for (let execute of this.data.wshortcutList) {
       if (execute.checked) {
-        projectWorkNote += execute.shortNote + ';';
+        projectWorkNote += execute.shortcutNote + ';';
       }
     }
-    pDetail['projectWorkNote'] = projectWorkNote;
+    pDetail['workNote'] = projectWorkNote;
     this.setData({
-      projectDetail: pDetail,
+      projectPlan: pDetail,
       wShortShow: false
     });
   },
@@ -484,16 +488,16 @@ Page({
    *  技术短语快捷输入确定
    */
   setTshortEvent:function(e){
-    let pDetail = this.data.projectDetail;
+    let pDetail = this.data.projectPlan;
     let projectWorkRequire = '';
     for (let execute of this.data.tshortcutList) {
       if (execute.checked) {
-        projectWorkRequire += execute.shortNote + ';';
+        projectWorkRequire += execute.shortcutNote + ';';
       }
     }
-    pDetail['projectWorkRequire'] = projectWorkRequire;
+    pDetail['workRequire'] = projectWorkRequire;
     this.setData({
-      projectDetail: pDetail,
+      projectPlan: pDetail,
       tShortShow: false
     });
   },
@@ -501,14 +505,29 @@ Page({
    * 选择作业组按钮事件
    */
   chooseWorkEvent:function(e){
-    let projectDetail = this.data.projectDetail;
-    if (projectDetail.projectOutPut == null){
+    let projectPlan = this.data.projectPlan;
+    if (projectPlan.projectOutput == null){
       utils.TipModel('错误',"请先设置并保存项目安排信息！", 0);
       return;
     }
     this.setData({
       workGroupShow : true
     });
+    var headMenlist = this.data.headManList;
+    let workGroupsList = this.data.workGroupsList;
+    for (let group of workGroupsList) {
+        if (group.checked) {
+          headMenlist.push(group['headMan']);
+        } else {
+          let index = headMenlist.indexOf(group['headMan']);
+          headMenlist = utils.arrayRemove(headMenlist, index);
+        }
+    }
+    this.setData({
+      headManList: headMenlist,
+      headManIndex: 0,
+      workGroupsList: workGroupsList
+    })
   },
   /**
    *返回 
@@ -640,47 +659,47 @@ Page({
    */
   rateInputEvent:function(e){
     console.log(e.detail.value);
-    let id = e.currentTarget.id.split('_')[1];
+    let groupId = e.currentTarget.id.split('_')[1];
     let name = e.currentTarget.id.split('_')[0];
     let groupList = this.data.workGroupsList;
-    let pDetail = this.data.projectDetail;
+    let pDetail = this.data.projectPlan;
     //占比输入
     if (name =='outputRate'){
       for (let group of groupList){
-        if (group['id'] == id){
+        if (group['groupId'] == groupId){
           let rate = parseFloat(e.detail.value);
-          let projectOutPut = (e.detail.value / 100 * pDetail.projectOutPut).toFixed(2);
-          group['output_rate'] = e.detail.value;
-          group['project_output'] = projectOutPut;
-          group['shortDate'] = (Math.ceil(projectOutPut / 2400 * 0.7 / 0.5) * 0.5);
-          group['lastDate'] = (Math.ceil(projectOutPut / 2400 * 1.3 / 0.5) * 0.5);
+          let projectOutPut = (e.detail.value / 100 * pDetail.projectOutput).toFixed(2);
+          group['outputRate'] = e.detail.value;
+          group['projectOutput'] = projectOutPut;
+          group['shortDateTime'] = (Math.ceil(projectOutPut / 2400 * 0.7 / 0.5) * 0.5);
+          group['lastDateTime'] = (Math.ceil(projectOutPut / 2400 * 1.3 / 0.5) * 0.5);
         }
       }
     }
     //产值输入
     if (name == 'projectOutput'){
       for (let group of groupList) {
-        if (group['id'] == id) {
-          group['output_rate'] = (e.detail.value / pDetail.projectOutPut * 100).toFixed(2);
-          group['project_output'] = e.detail.value;
-          group['shortDate'] = (Math.ceil(e.detail.value / 2400 * 0.7 / 0.5) * 0.5);
-          group['lastDate'] = (Math.ceil(e.detail.value / 2400 * 1.3 / 0.5) * 0.5);
+        if (group['groupId'] == groupId) {
+          group['outputRate'] = (e.detail.value / pDetail.projectOutput * 100).toFixed(2);
+          group['projectOutput'] = e.detail.value;
+          group['shortDateTime'] = (Math.ceil(e.detail.value / 2400 * 0.7 / 0.5) * 0.5);
+          group['lastDateTime'] = (Math.ceil(e.detail.value / 2400 * 1.3 / 0.5) * 0.5);
         }
       }
     }
     //最短工期输入
-    if (name == 'shortDate') {
+    if (name == 'shortDateTime') {
       for (let group of groupList) {
-        if (group['id'] == id) {
-          group['shortDate'] = e.detail.value;
+        if (group['groupId'] == groupId) {
+          group['shortDateTime'] = e.detail.value;
         }
       }
     }
     //最迟工期输入
-    if (name == 'lastDate') {
+    if (name == 'lastDateTime') {
       for (let group of groupList) {
-        if (group['id'] == id) {
-          group['lastDate'] = e.detail.value;
+        if (group['groupId'] == groupId) {
+          group['lastDateTime'] = e.detail.value;
         }
       }
     }
@@ -753,7 +772,7 @@ Page({
     var headMenlist = this.data.headManList;
     let workGroupsList = this.data.workGroupsList;
     for (let group of workGroupsList){
-      if (group['id'] == e.currentTarget.id){
+      if (group['groupId'] == e.currentTarget.id){
         group.checked = !group.checked;
         if (group.checked){
           headMenlist.push(group['headMan']);

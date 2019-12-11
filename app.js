@@ -1,6 +1,7 @@
 //app.js
 import wxValidate from 'utils/wxValidate'
 
+
 App({
   onLaunch: function () {
     // 展示本地存储能力

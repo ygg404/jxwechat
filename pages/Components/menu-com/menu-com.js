@@ -163,8 +163,8 @@ Component({
     pmcate_list[3].visiable = (permissionsList.indexOf('project:project:plan') != -1);
     ppcate_list[0].visiable = (permissionsList.indexOf('project_contract') != -1);
     ppcate_list[1].visiable = (permissionsList.indexOf('put_project') != -1);
-    ppcate_list[2].visiable = (permissionsList.indexOf('make_project') != -1);
-    ppcate_list[3].visiable = (permissionsList.indexOf('start_project') != -1);
+    ppcate_list[2].visiable = (permissionsList.indexOf('project:project:plan') != -1);
+    ppcate_list[3].visiable = (permissionsList.indexOf('project:work:list') != -1);
     ppcate_list[4].visiable = (permissionsList.indexOf('inspect_quality') != -1);
     ppcate_list[5].visiable = (permissionsList.indexOf('adjust_output') != -1);
     ppcate_list[6].visiable = (permissionsList.indexOf('leader_authorize') != -1);
