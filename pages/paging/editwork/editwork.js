@@ -1,5 +1,6 @@
 // paging/editwork/editwork.js
 var utils = require('../../../utils/util.js');
+var httpRequest = require('../../../utils/httpRequest.js');
 var app = getApp();
 
 Page({
@@ -23,11 +24,12 @@ Page({
     p_name:'',
     scheduleList:[], //进度列表
     schedSelected:false,
-    ptwork:{},  //项目信息
+    projectWork:{},  //项目作业信息
     ptworkSelected:false,
     addScheduleShow:false, //添加进度
     projectNote:'',  //进度内容
-    projectRate:0    //当前进度
+    projectRate:0,    //当前进度
+    projectInfo:''   //项目基本信息
   },
 
   /**
@@ -39,6 +41,7 @@ Page({
       p_group: options.p_group,
       p_name: options.p_name
     });
+    this.getProjectWork();
     this.getProjectinfo();
     this.getShortCutList();
     this.wxValidateInit();
@@ -127,95 +130,66 @@ Page({
    */
   getShortCutList: function () {
     var that = this;
-    wx.request({
-      url: app.globalData.WebUrl + "shortcut/5/",
-      method: 'GET',
-      header: {
-        'Authorization': "Bearer " + app.globalData.SignToken
-      },
-      success: function (res) {
-        if (res.statusCode == 200) {
-          for(let shortcut of res.data){
-            shortcut.checked = false;
-          }
-          that.setData({
-            tshortcutList : res.data
-          })
-        }
+    httpRequest.requestUrl({
+      url: "/set/wpshortcut/getListByShortTypeId/5",
+      params: {},
+      method: "get"
+    }).then(data => {
+      for (let shortcut of data.list) {
+        shortcut.checked = false;
       }
-    });
-
-    wx.request({
-      url: app.globalData.WebUrl + "shortcut/6/",
-      method: 'GET',
-      header: {
-        'Authorization': "Bearer " + app.globalData.SignToken
-      },
-      success: function (res) {
-        if (res.statusCode == 200) {
-          for (let shortcut of res.data) {
-            shortcut.checked = false;
-          }
-          that.setData({
-            pshortcutList: res.data
-          })
-        }
+      that.setData({
+        tshortcutList: data.list,
+      })
+    })
+    httpRequest.requestUrl({
+      url: "/set/wpshortcut/getListByShortTypeId/6",
+      params: {},
+      method: "get"
+    }).then(data => {
+      for (let shortcut of data.list) {
+        shortcut.checked = false;
       }
-    });
-
-    wx.request({
-      url: app.globalData.WebUrl + "shortcut/7/",
-      method: 'GET',
-      header: {
-        'Authorization': "Bearer " + app.globalData.SignToken
-      },
-      success: function (res) {
-        if (res.statusCode == 200) {
-          for (let shortcut of res.data) {
-            shortcut.checked = false;
-          }
-          that.setData({
-            ishortcutList: res.data
-          })
-        }
+      that.setData({
+        pshortcutList: data.list,
+      })
+    })
+    httpRequest.requestUrl({
+      url: "/set/wpshortcut/getListByShortTypeId/7",
+      params: {},
+      method: "get"
+    }).then(data => {
+      for (let shortcut of data.list) {
+        shortcut.checked = false;
       }
-    });
-
-    wx.request({
-      url: app.globalData.WebUrl + "shortcut/8/",
-      method: 'GET',
-      header: {
-        'Authorization': "Bearer " + app.globalData.SignToken
-      },
-      success: function (res) {
-        if (res.statusCode == 200) {
-          for (let shortcut of res.data) {
-            shortcut.checked = false;
-          }
-          that.setData({
-            wshortcutList: res.data
-          })
-        }
+      that.setData({
+        ishortcutList: data.list,
+      })
+    })
+    httpRequest.requestUrl({
+      url: "/set/wpshortcut/getListByShortTypeId/8",
+      params: {},
+      method: "get"
+    }).then(data => {
+      for (let shortcut of data.list) {
+        shortcut.checked = false;
       }
-    });
-
-    wx.request({
-      url: app.globalData.WebUrl + "shortcut/11/",
-      method: 'GET',
-      header: {
-        'Authorization': "Bearer " + app.globalData.SignToken
-      },
-      success: function (res) {
-        if (res.statusCode == 200) {
-          for (let shortcut of res.data) {
-            shortcut.checked = false;
-          }
-          that.setData({
-            ashortcutList: res.data
-          })
-        }
+      that.setData({
+        wshortcutList: data.list,
+      })
+    })
+    httpRequest.requestUrl({
+      url: "/set/wpshortcut/getListByShortTypeId/11",
+      params: {},
+      method: "get"
+    }).then(data => {
+      for (let shortcut of data.list) {
+        shortcut.checked = false;
       }
-    });
+      that.setData({
+        ashortcutList: data.list,
+      })
+    })
   },
   /**
    * 技术交底快捷输入
@@ -253,15 +227,16 @@ Page({
    *  技术短语快捷输入确定
    */
   setTshortEvent: function (e) {
-    let pDetail = this.data.projectDetail;
-    let disclosureNote = '';
+    let projectWork = this.data.projectWork;
+    let technicalDisclosureNote = '';
     for (let execute of this.data.tshortcutList) {
       if (execute.checked) {
-        disclosureNote += execute.shortNote + ';';
+        technicalDisclosureNote += execute.shortcutNote + ';';
       }
     }
+    projectWork.technicalDisclosureNote = technicalDisclosureNote
     this.setData({
-      disclosureNote: disclosureNote,
+      projectWork: projectWork,
       tShortShow: false
     });
   },
@@ -301,15 +276,16 @@ Page({
    *  过程检查快捷输入确定
    */
   setPshortEvent: function (e) {
-    let pDetail = this.data.projectDetail;
+    let projectWork = this.data.projectWork;
     let checkSuggestion = '';
     for (let execute of this.data.pshortcutList) {
       if (execute.checked) {
-        checkSuggestion += execute.shortNote + ';';
+        checkSuggestion += execute.shortcutNote + ';';
       }
     }
+    projectWork.checkSuggestion = checkSuggestion
     this.setData({
-      checkSuggestion: checkSuggestion,
+      projectWork: projectWork,
       pShortShow: false
     });
   },
@@ -350,15 +326,16 @@ Page({
    *  上交资料快捷输入确定
    */
   setIshortEvent: function (e) {
-    let iDetail = this.data.projectDetail;
+    let projectWork = this.data.projectWork;
     let dataName = '';
     for (let execute of this.data.ishortcutList) {
       if (execute.checked) {
-        dataName += execute.shortNote + ';';
+        dataName += execute.shortcutNote + ';';
       }
     }
+    projectWork.dataName = dataName
     this.setData({
-      dataName: dataName,
+      projectWork: projectWork,
       iShortShow: false
     });
   },
@@ -399,15 +376,16 @@ Page({
    *  工作小结快捷输入确定
    */
   setWshortEvent: function (e) {
-    let wDetail = this.data.projectDetail;
+    let projectWork = this.data.projectWork;
     let briefSummary = '';
     for (let execute of this.data.wshortcutList) {
       if (execute.checked) {
-        briefSummary += execute.shortNote + ';';
+        briefSummary += execute.shortcutNote + ';';
       }
     }
+    projectWork.briefSummary = briefSummary
     this.setData({
-      briefSummary: briefSummary,
+      projectWork: projectWork,
       wShortShow: false
     });
   },
@@ -449,15 +427,16 @@ Page({
    *  工作量快捷输入确定
    */
   setAshortEvent: function (e) {
-    let aDetail = this.data.projectDetail;
+    let projectWork = this.data.projectWork;
     let workLoad = '';
     for (let execute of this.data.ashortcutList) {
       if (execute.checked) {
-        workLoad += execute.shortNote + ';';
+        workLoad += execute.shortcutNote + ';';
       }
     }
+    projectWork.workLoad = workLoad
     this.setData({
-      workLoad: workLoad,
+      projectWork: projectWork,
       aShortShow: false
     });
   },
@@ -466,46 +445,45 @@ Page({
    */
   getProjectinfo:function(){
     let that = this;
-    wx.request({
-      url: app.globalData.WebUrl + "projectWork/?projectNo=" + that.data.p_no + "&groupId=" + that.data.p_group,
-      method: 'GET',
-      header: {
-        'Authorization': "Bearer " + app.globalData.SignToken
-      },
-      success: function (res) {
-        if (res.statusCode == 201) {
-          res.data.projectBegunDate = res.data.projectBegunDate.replace(" 00:00:00","")
-          that.setData({
-            ptwork : res.data,
-            disclosureNote: res.data.disclosureNote,
-            checkSuggestion: res.data.checkSuggestion,
-            dataName: res.data.dataName,
-            briefSummary: res.data.briefSummary,
-            workLoad: res.data.workLoad
-          })
-        }
-      }
-    });
+    httpRequest.requestUrl({
+      url: "/project/projectInfo/info/" + that.data.p_no,
+      params: {},
+      method: "get"
+    }).then(data => {
+      that.setData({
+        projectInfo: data.projectInfo,
+      })
+    })
   },
   /**
  * 获取项目进度信息
  */
   getScheduleInfo: function () {
     let that = this;
-    wx.request({
-      url: app.globalData.WebUrl + "project/schedule/" + that.data.p_no + "/",
-      method: 'GET',
-      header: {
-        'Authorization': "Bearer " + app.globalData.SignToken
-      },
-      success: function (res) {
-        if (res.statusCode == 201) {
-          that.setData({
-            scheduleList: res.data
-          })
-        }
-      }
-    });
+    httpRequest.requestUrl({
+      url: "/project/schedule/list?projectNo=" + that.data.p_no,
+      params: {},
+      method: "get"
+    }).then(data => {
+      that.setData({
+        scheduleList: data.list,
+      })
+    })
+  },
+  /**
+* 获取项目工作信息
+*/
+  getProjectWork: function () {
+    let that = this;
+    httpRequest.requestUrl({
+      url: "/project/work/getInfoByProjectNo/" + that.data.p_no,
+      params: {},
+      method: "get"
+    }).then(data => {
+      that.setData({
+        projectWork: data.projectWork,
+      })
+    })
   },
   /**
    *查看项目基本信息事件
@@ -611,6 +589,7 @@ Page({
    * 添加进度
    */
   addEvent:function(e){
+    let scheduleList = th
     let rate = this.data.ptwork.projectRate;
     this.setData({
       addScheduleShow:true,

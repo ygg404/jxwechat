@@ -6,16 +6,16 @@
       <image src="{{ptworkSelected ? '/images/tridown.png' :'/images/triup.png'}}"></image>
     </view>
     <view class="table"   wx:if="{{ptworkSelected}}">
-      <view class='tr detail'><text>项目名称：</text><text>{{ptwork.projectName}}</text></view>
-      <view class='tr detail'><text>业务负责人：</text><text>{{ptwork.projectBusiness}}</text></view>
-      <view class='tr detail'><text>联系人：</text><text>{{ptwork.projectPlan.userName}}</text></view>
-      <view class='tr detail'><text>联系电话：</text><text>{{ptwork.projectPlan.userPhone}}</text></view>
-      <view class='tr detail'><text>委托单位：</text><text>{{ptwork.projectPlan.projectAuthorize}}</text></view>
-      <view class='tr detail'><text>委托要求：</text><text>{{ptwork.projectPlan.projectNote}}</text></view>
-      <view class='tr detail'><text style="min-width:65px;">作业内容：</text><text>{{ptwork.projectPlan.projectWorkNote}}</text></view>
-      <view class='tr detail'><text style="min-width:65px;">技术要求：</text><text>{{ptwork.projectPlan.projectWorkRequire}}</text></view>
-      <view class='tr detail'><text style="min-width:65px;">执行标准：</text><text>{{ptwork.projectPlan.projectExecuteStandard}}</text></view>
-      <view class='tr detail'><text>项目开工时间：</text><text>{{ptwork.projectBegunDate}}</text></view>
+      <view class='tr detail'><text>项目名称：</text><text>{{projectInfo.projectName}}</text></view>
+      <view class='tr detail'><text>业务负责人：</text><text>{{projectInfo.contractBusiness}}</text></view>
+      <view class='tr detail'><text>联系人：</text><text>{{projectInfo.userName}}</text></view>
+      <view class='tr detail'><text>联系电话：</text><text>{{projectInfo.userPhone}}</text></view>
+      <view class='tr detail'><text>委托单位：</text><text>{{projectInfo.projectAuthorize}}</text></view>
+      <view class='tr detail'><text>委托要求：</text><text>{{projectInfo.projectNote}}</text></view>
+      <view class='tr detail'><text style="min-width:65px;">作业内容：</text><text>{{projectInfo.workNote}}</text></view>
+      <view class='tr detail'><text style="min-width:65px;">技术要求：</text><text>{{projectInfo.workRequire}}</text></view>
+      <view class='tr detail'><text style="min-width:65px;">执行标准：</text><text>{{projectInfo.executeStandard}}</text></view>
+      <view class='tr detail'><text>项目开工时间：</text><text>{{projectInfo.projectBegunDateTime}}</text></view>
     </view>
     <view class="tr" bindtap='viewScheduleEvent'>
       <text>进度记录</text>
@@ -23,17 +23,17 @@
     </view>
     <view class="table"  wx:if="{{schedSelected}}">
        <view class="tr">
-          <view class="th th1">编号</view>
+          <!-- <view class="th th1">编号</view> -->
           <view class="th th2">日期</view>
           <view class="th th3">当前进度</view>
           <view class="th th4">进度内容</view>
       </view>
       <view wx:for="{{scheduleList}}" wx:for-item="project" >
         <view class="tr">
-            <view class='td td1'>{{project.id}}</view>
-            <view class="td td2">{{project.scheduleCreateTime}}</view>
-            <view class="td td3">{{project.projectRate}}</view>
-            <view class="td td4">{{project.projectNote==null?'':project.projectNote}}</view>
+            <!-- <view class='td td1'>{{project.id}}</view> -->
+            <view class="td td2">{{project.createTime}}</view>
+            <view class="td td3">{{project.scheduleRate}}</view>
+            <view class="td td4">{{project.scheduleNote==null?'':project.scheduleNote}}</view>
         </view>
       </view>
     </view>
@@ -55,7 +55,7 @@
       </view>
     </view>
     <view class="tr" >
-      <textarea maxlength='-1' placeholder='技术交底内容' name='disclosureNote' value='{{disclosureNote}}'></textarea>
+      <textarea maxlength='-1' placeholder='技术交底内容' name='disclosureNote' value='{{projectWork.technicalDisclosureNote}}'></textarea>
     </view>
     <view class='tr'>
       <view class='select_box'>
@@ -66,7 +66,7 @@
       </view>
     </view>
     <view class="tr" >
-      <textarea maxlength='-1' placeholder='过程检查意见' name='checkSuggestion' value='{{checkSuggestion}}'></textarea>
+      <textarea maxlength='-1' placeholder='过程检查意见' name='checkSuggestion' value='{{projectWork.checkSuggestion}}'></textarea>
     </view>
 
     <view class='tr'>
@@ -78,7 +78,7 @@
       </view>
     </view>
     <view class="tr" >
-      <textarea maxlength='-1' placeholder='上交资料' name='dataName' value='{{dataName}}'></textarea>
+      <textarea maxlength='-1' placeholder='上交资料' name='dataName' value='{{projectWork.dataName}}'></textarea>
     </view>
 
     <view class='tr'>
@@ -90,7 +90,7 @@
       </view>
     </view>
     <view class="tr" >
-      <textarea maxlength='-1' placeholder='工作小结' name='briefSummary' value='{{briefSummary}}'></textarea>
+      <textarea maxlength='-1' placeholder='工作小结' name='briefSummary' value='{{projectWork.briefSummary}}'></textarea>
     </view>
 
     <view class='tr'>
@@ -102,7 +102,7 @@
       </view>
     </view>
     <view class="tr" >
-      <textarea maxlength='-1' placeholder='工作量' name='workLoad' value='{{workLoad}}'></textarea>
+      <textarea maxlength='-1' placeholder='工作量' name='workLoad' value='{{projectWork.workLoad}}'></textarea>
     </view>
   </view>
 </view>
@@ -163,7 +163,7 @@
         <view class='tr'>
           <checkbox-group bindchange="tShortCheckEvent">
             <label wx:for="{{tshortcutList}}" wx:for-item="tshort" style='display:block;'>
-              <checkbox  value='{{tshort.id}}' checked="{{tshort.checked}}"/>{{tshort.shortNote}}
+              <checkbox  value='{{tshort.id}}' checked="{{tshort.checked}}"/>{{tshort.shortcutNote}}
             </label>
           </checkbox-group>
         </view>
@@ -186,7 +186,7 @@
         <view class='tr'>
           <checkbox-group bindchange="pShortCheckEvent">
             <label wx:for="{{pshortcutList}}" wx:for-item="pshort" style='display:block;'>
-              <checkbox  value='{{pshort.id}}' checked="{{pshort.checked}}"/>{{pshort.shortNote}}
+              <checkbox  value='{{pshort.id}}' checked="{{pshort.checked}}"/>{{pshort.shortcutNote}}
             </label>
           </checkbox-group>
         </view>
@@ -209,7 +209,7 @@
         <view class='tr'>
           <checkbox-group bindchange="iShortCheckEvent">
             <label wx:for="{{ishortcutList}}" wx:for-item="ishort" style='display:block;'>
-              <checkbox  value='{{ishort.id}}' checked="{{ishort.checked}}"/>{{ishort.shortNote}}
+              <checkbox  value='{{ishort.id}}' checked="{{ishort.checked}}"/>{{ishort.shortcutNote}}
             </label>
           </checkbox-group>
         </view>
@@ -232,7 +232,7 @@
         <view class='tr'>
           <checkbox-group bindchange="wShortCheckEvent">
             <label wx:for="{{wshortcutList}}" wx:for-item="wshort" style='display:block;'>
-              <checkbox  value='{{wshort.id}}' checked="{{wshort.checked}}"/>{{wshort.shortNote}}
+              <checkbox  value='{{wshort.id}}' checked="{{wshort.checked}}"/>{{wshort.shortcutNote}}
             </label>
           </checkbox-group>
         </view>
@@ -255,7 +255,7 @@
         <view class='tr'>
           <checkbox-group bindchange="aShortCheckEvent">
             <label wx:for="{{ashortcutList}}" wx:for-item="ashort" style='display:block;'>
-              <checkbox  value='{{ashort.id}}' checked="{{ashort.checked}}"/>{{ashort.shortNote}}
+              <checkbox  value='{{ashort.id}}' checked="{{ashort.checked}}"/>{{ashort.shortcutNote}}
             </label>
           </checkbox-group>
         </view>

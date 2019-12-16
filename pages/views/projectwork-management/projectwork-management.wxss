@@ -77,6 +77,18 @@
   margin-left: 1%;
 }
 
+.issetSpan{
+  background:green;
+  color:white;
+  border-radius:5px;
+}
+
+.notsetSpan{
+  background:gray;
+  color:white;
+  border-radius:5px;
+}
+
 .tr{
   text-align: left;
   width:100%;

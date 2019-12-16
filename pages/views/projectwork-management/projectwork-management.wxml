@@ -9,7 +9,7 @@
       <view style='width:45%;' >
         <input placeholder="开始日期" disabled='true' value='{{pagination.startDate}}' bindtap='setStartDateEvent' class='inputdate'></input>
       </view>
-      -
+      -`
       <view style='width:45%;' >
         <input placeholder="结束日期" disabled='true' value='{{pagination.endDate}}' bindtap='setEndDateEvent' class='inputdate'></input>
       </view>
@@ -33,14 +33,20 @@
   <view class="table">
       <view class="tr">
           <view class='th0'></view>
-          <view class="th th1">合同编号</view>
-          <view class="th th2">合同名称</view>
+          <view class="th th1">项目编号</view>
+          <view class="th th2">项目名称</view>
           <view class="th th3">操作</view>
       </view>
       <view wx:for="{{tableList}}" wx:for-item="project" >
         <view class="tr" >
             <view class='td0'>{{project.selected?'v':'>'}}</view>
-            <view class="td td1" bindtap='detailClickEvent' id="{{project.id}}">{{project.projectNo==null?'':project.projectNo}}</view>
+            <view class="td td1" bindtap='detailClickEvent' id="{{project.id}}">
+            {{project.projectNo==null?'':project.projectNo}}
+              <view>
+                <span wx:if='{{project.isWork == 1}}' class="issetSpan">已作业</span>
+                <span wx:if='{{project.isWork != 1}}' class="notsetSpan">未作业</span>
+              </view>
+            </view>
             <view class="td td2">{{project.projectName}}</view>
             <view class="td td3">
               <view><button class='resbtn' bindtap='editClickEvent' id="{{project.id}}">编辑</button></view>
@@ -51,10 +57,9 @@
         <view wx:if="{{project.selected}}">
           <view class='tr detail'><text>项目负责人：</text><text>{{project.projectCharge}}</text></view>
           <view class='tr detail'><text>委托单位：</text><text>{{project.projectAuthorize}}</text></view>
-          <view class='tr detail'><text>项目状态：</text><text>{{project.workStage == 0? "开始" : "暂停"}}</text></view>
-          <view class='tr detail'><text>项目类型：</text><text>{{project.projectType}}</text></view>
-          <view class='tr detail'><text>项目阶段：</text><text>{{project.projectStage}}</text></view>
-          <view class='tr detail'><text>启动时间：</text><text>{{project.projectStartTime}}</text></view>
+          <view class='tr detail'><text>项目状态：</text><text>{{project.projectStatus == 0? "启动" : "暂停"}}</text></view>
+          <!-- <view class='tr detail'><text>项目类型：</text><text>{{project.projectType}}</text></view> -->
+          <view class='tr detail'><text>启动时间：</text><text>{{project.projectStartDateTime}}</text></view>
         </view>
       </view>
       <view class="tr">
