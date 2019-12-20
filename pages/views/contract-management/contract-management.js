@@ -1,20 +1,19 @@
-// pages/views/contract-management/contract-management.js
 var utils = require('../../../utils/util.js');
+var httpRequest = require('../../../utils/httpRequest.js');
 var app = getApp();
-
 Page({
 
   /**
    * 页面的初始数据
    */
   data: {
-    urlId:'contract-management',
+    urlId: 'contract-management',
     calendarShow: false,    //日历显示
-    contractCalendarShow:false, //合同日历
+    contractCalendarShow: false, //合同日历
     setStartflag: false, //设置开始日期标志
-    addContractShow: false , //合同管理表单
-    selectTypeShow:false,    //项目类型多选0
-    btnName:'',
+    addContractShow: false, //合同管理表单
+    selectTypeShow: false,    //项目类型多选0
+    btnName: '',
     dateInfo: '',
     pagination: {
       'page': 1,
@@ -33,10 +32,10 @@ Page({
     contractAddTime: '', //日期
     projectTypes: [],  //类型选择
     projectTypesList: [],
-    projectTypeID: 0 ,
-    business:[], //业务负责人列表
-    businessId:0,
-    businessName:[],
+    projectTypeID: 0,
+    business: [], //业务负责人列表
+    businessId: 0,
+    businessName: [],
     contractDetail: {}, //合同详情
     typeId: 0, //类型ID
     projectType: '', //项目类型
@@ -46,10 +45,7 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-    this.getBusinessInfo();
-    this.getProjectTypesInfo();
-    this.getProjectsFromApi();
-    this.wxValidateInit();
+
   },
 
   /**
@@ -63,7 +59,8 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
-
+    //合同编号
+    this.getContractFromApi();
   },
 
   /**
@@ -79,145 +76,69 @@ Page({
   onPullDownRefresh: function () {
 
   },
-
-  /**
-   * 表单验证的初始化函数
-   */
-  wxValidateInit: function () {
-    this.WxValidate = app.wxValidate(
-      {
-        contractName: {
-          required: true,
-        },
-        contractAddTime: {
-          required: true,
-        },
-        contractAuthorize: {
-          required: true,
-        },
-        contractNote: {
-          required: true,
-        },
-        contractMoney: {
-          required: true,
-        }
-      }
-      , {
-        contractName: {
-          required: '请输入合同名称',
-        },
-        contractAddTime: {
-          required: '请填写签订时间',
-        },
-        contractAuthorize: {
-          required: '请输入委托单位',
-        },
-        contractNote: {
-          required: '请输入委托要求',
-        },
-        contractMoney: {
-          required: '请填写合同金额',
-        }
-      }
-    )
-  },
-  /**
-  * 获取业务负责人列表
-  */
-  getBusinessInfo: function () {
-    var that = this;
-    //加载阶段选项
-    wx.request({
-      url: app.globalData.WebUrl + "user/business/",
-      method: 'GET', // OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT  
-      // 设置请求的 header  
-      header: {
-        'Authorization': "Bearer " + app.globalData.SignToken
-      },
-      success: function (res) {
-        let businessName = [];
-        if (res.statusCode == 201) {
-          for (let bInfo of res.data){
-             businessName.push(bInfo['userName']);
-          }
-          that.setData({
-            businessName: businessName,
-            business: res.data
-          })
-        }
-
-      }
-    })
-  },
   /**
   * 获取项目类型
   */
-  getProjectTypesInfo: function () {
+  getProjectTypesInfo: function (e) {
     var that = this;
-    //加载阶段选项
-    wx.request({
-      url: app.globalData.WebUrl + "projectTypes/",
-      method: 'GET', // OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT  
-      // 设置请求的 header  
-      header: {
-        'Authorization': "Bearer " + app.globalData.SignToken
-      },
-      success: function (res) {
-        if (res.statusCode == 200) {
-          let ptypeInfo = [];
-          for (var ptype of res.data) {
-            ptypeInfo.push(ptype.name);
-          }
-          that.setData({
-            projectTypes: ptypeInfo,
-            projectTypesList: res.data
-          })
+    return new Promise((resolve, reject) => {
+      httpRequest.requestUrl({
+        url: "set/projecttype/getProjectTypelist",
+        params: {},
+        method: "get"
+      }).then(data => {
+        var stagesInfo = ['所有类型'];
+        for (var stage of data.list) {
+          stagesInfo.push(stage.name);
         }
-
-      },
-      fail: function (res) {
-
-      }
+        that.setData({
+          projectTypes: stagesInfo
+        })
+        resolve(e)
+      })
     })
+  },
+  /**
+ * 类型改变
+ */
+  ProTypeChangeEvent: function (e) {
+    var pagination = this.data.pagination;
+    if (e.detail.value == 0) {
+      pagination.search = '';
+    } else {
+      pagination.search = this.data.projectTypes[e.detail.value];
+    }
+    this.setData({
+      projectTypeID: e.detail.value,
+      pagination: pagination
+    })
+    this.getProjectsFromApi();
   },
   /**
    * 合同管理列表
    */
-  getProjectsFromApi: function () {
-    var pagination = this.data.pagination;
+  getContractFromApi: function () {
     var that = this;
-    wx.request({
-      url: app.globalData.WebUrl + "contract/",
-      method: 'GET',
-      data: {
-        page: pagination.page,
-        rowsPerPage: pagination.rowsPerPage,
-        sortBy: pagination.sortBy,
-        descending: pagination.descending,
-        search: pagination.search,
-        startDate: pagination.startDate,
-        endDate: pagination.endDate,
-        userGroup: '',
-        userAccount: ''
+    httpRequest.requestUrl({
+      url: "project/contract/list",
+      params: {
+        page: that.data.pagination.page,
+        limit: that.data.pagination.rowsPerPage,
+        key: that.data.pagination.search,
+        sidx: 'id',
+        order: that.data.pagination.sortBy,
+        startDate: that.data.pagination.startDate,
+        endDate: that.data.pagination.endDate
       },
-      // 设置请求的 header  
-      header: {
-        'Authorization': "Bearer " + app.globalData.SignToken
-      },
-      success: function (res) {
-        if (res.statusCode == 200) {
-          utils.tableListInit(res.data['data']);
-          that.setData({
-            has_next: res.data.has_next,  //是否有上下页
-            has_pre: res.data.has_prev,
-            tableList: res.data['data']
-          });
-        }
-
-      },
-      fail: function (res) {
-
-      }
+      method: "get"
+    }).then(data => {
+      let hasPre = data.page.currPage > 1 && data.page.currPage <= data.page.totalPage
+      let hasNext = data.page.currPage < data.page.totalPage
+      that.setData({
+        tableList: data.page.list,
+        has_next: hasNext,  //是否有上下页
+        has_pre: hasPre,
+      })
     })
   },
 
@@ -230,7 +151,7 @@ Page({
     this.setData({
       pagination: pagination
     });
-    this.getProjectsFromApi();
+    this.getContractFromApi();
   },
 
   /**
@@ -256,15 +177,7 @@ Page({
       dateInfo: endDate
     });
   },
-  /**
-   * 类型改变
-   */
-  ProTypeChangeEvent: function (e) {
-    this.setData({
-      projectTypeID: e.detail.value,
-    })
-    this.getProjectsFromApi();
-  },
+
   /**
    * 日历事件
    */
@@ -296,7 +209,7 @@ Page({
       })
     }
 
-    this.getProjectsFromApi();
+    this.getContractFromApi();
   },
 
   /**
@@ -327,7 +240,7 @@ Page({
     this.setData({
       pagination: pagination
     });
-    this.getProjectsFromApi();
+    this.getContractFromApi();
     wx.pageScrollTo({
       scrollTop: 0
     })
@@ -342,102 +255,27 @@ Page({
     this.setData({
       pagination: pagination
     });
-    this.getProjectsFromApi();
+    this.getContractFromApi();
     wx.pageScrollTo({
       scrollTop: 0
     })
   },
 
-  /***
-   *添加合同 
-   */
-  addContract:function(e){
-    var that = this;
-    wx.request({
-      url: app.globalData.WebUrl + "contract/getContractNumMax/",
-      method: 'GET',
-      // 设置请求的 header  
-      header: {
-        'Authorization': "Bearer " + app.globalData.SignToken
-      },
-      success: function (res) {
-        if (res.statusCode == 200) {
-          let cDetail = {};
-          cDetail['contractNo'] = res.data;
-          that.setData({
-            contractNo: res.data,
-            addContractShow: true,
-            btnName:'添加',
-            contractDetail: cDetail,
-            contractAddTime:'',
-            typeId:0,
-            projectTypeID:0
-          });
-        }
 
-      },
-      fail: function (res) {
-
-      }
-    });
-  },
   /**
    * 选择文件
    */
-  chooseFile: function(e){
-    var that = this;
-    wx.chooseImage({
-      count: 1, // 默认9
-      success: function (res) {
-        // 返回选定照片的本地文件路径列表，tempFilePath可以作为img标签的src属性显示图片
-        var tempFilePaths = res.tempFilePaths;
-        wx.showToast({
-          title: '正在上传...',
-          icon: 'loading',
-          mask: true,
-          duration: 2000
-        }) 
-        wx.uploadFile({
-          url: app.globalData.upContractUrl,
-          filePath: tempFilePaths[0],
-          header: {
-            'Authorization': "Bearer " + app.globalData.SignToken
-          },
-          name: 'file',
-          formData: {
-            'contractNo': that.data.contractDetail.contractNo
-          }, 
-          success:function(res){
-            if(res.statusCode == 200){
-              wx.showToast({
-                title: '上传成功!',
-              });
-              let cDetail = that.data.contractDetail;
-              cDetail['fileName'] = tempFilePaths[0];
-              that.setData({
-                contractDetail: cDetail
-              })
-            }else{
-              wx.showToast({
-                title: '上传失败',
-                image: '/images/warn.png',
-                duration: 2000
-              })
-            }
-          }
-        })
-      }
-    })
+  chooseFile: function (e) {
 
   },
   /**
    * 合同签订时间
    */
-  contractAddTimeEvent:function(e){
+  contractAddTimeEvent: function (e) {
     console.log(e);
     this.setData({
-      contractCalendarShow:true
-    })  
+      contractCalendarShow: true
+    })
   },
   /**
  * 合同日历事件
@@ -451,7 +289,6 @@ Page({
       })
       return;
     }
-
     if (e.type == 'setEvent') {
       this.setData({
         contractCalendarShow: false,
@@ -459,74 +296,18 @@ Page({
       })
     }
   },
-  /**
-   * 合同编辑事件
-   */
-  editEvent:function(e){
-    let cDetail = {};
-    for (let contract of this.data.tableList) {
-      if (contract['id'] == e.currentTarget.id) {
-        let projectTypeID = this.data.projectTypes.indexOf(contract['projectType']);
-        let businessId = this.data.businessName.indexOf(contract['contractBusiness']);
-        this.setData({
-          contractAddTime: contract['contractAddTime'],
-          addContractShow: true,
-          btnName: '修改',
-          contractDetail: contract,
-          projectTypeID: projectTypeID,
-          businessId: businessId
-        })
-        break;
-      }
-    }
 
-  },
   /**
    *合同下载
    */
-  downloadEvent:function(e){
-    let cDetail = {};
-    for (let contract of this.data.tableList) {
-      if (contract['id'] == e.currentTarget.id) {
-        wx.showToast({
-          title: '正在下载中...',
-          icon: 'loading',
-          mask: true,
-          duration: 2000
-        }) 
-        wx.downloadFile({
-          url: app.globalData.downContractUrl + contract['contractNo'],
-          header: {
-            'Authorization': "Bearer " + app.globalData.SignToken
-          },
-          success:function(res){
-            wx.saveImageToPhotosAlbum({
-              tempFilePath: res.tempFilePath,
-              success: function (result) {
-                wx.showToast({
-                  title:'下载完成'
-                });
-              }
-            });
-          }
-        });
-        break;
-      }
-    }
+  downloadEvent: function (e) {
+
   },
-  /**
-   * 合同类型选择
-   */
-  radioChange: function(e){
-    let cDetail = this.data.contractDetail;
-    this.setData({
-      typeId: e.detail.value
-    }) 
-  },
+
   /**
    * 删除合同事件
    */
-  delEvent: function(e){
+  delEvent: function (e) {
     var that = this;
     let contractNo = '';
     for (let contract of this.data.tableList) {
@@ -535,180 +316,95 @@ Page({
         break;
       }
     }
+    var dataListSelections = [];
+    var shouddelids = Number(e.currentTarget.id) ? [Number(e.currentTarget.id)] : dataListSelections.map(item => {
+      return item.ids
+    });
     wx.showModal({
       title: '提示',
       content: '确定要删除编号为' + contractNo + '的合同吗？',
       success: function (sm) {
         if (sm.confirm) {
-                wx.request({
-                  url: app.globalData.WebUrl + 'contract/?contractNo=' + contractNo,
-                  header: {
-                    'Authorization': "Bearer " + app.globalData.SignToken
-                  },
-                  method: 'DELETE',
-                  success: function (res) {
-                    //添加修改成功
-                    if (res.statusCode == 200) {
-                      that.setData({
-                        addContractShow: false
-                      })
-                      wx.showToast({
-                        title: res.data.message,
-                        icon: 'success',
-                        duration: 2000
-                      });
-                      that.getProjectsFromApi();
-                    }
-                  }
-                });
-              }
-            }
-      
-    });
-  },
-  /**
-   *添加合同取消
-   */
-  returnDetail:function(e){
-    this.setData({
-      addContractShow: false
-    })
-  },
-  //表单提交
-  formSubmit: function (e) {
-    //提交错误描述
-    if (!this.WxValidate.checkForm(e)) {
-      const error = this.WxValidate.errorList[0]
-      // `${error.param} : ${error.msg} `
-      wx.showToast({
-        title: `${error.msg} `,
-        image: '/images/warn.png',
-        duration: 2000
-      })
-      return false
-    }
-    var that = this;
-    let _url = '';
-    if(that.data.btnName == '添加'){
-      _url = app.globalData.WebUrl + 'contract/';
-    }else{ //修改
-      _url = app.globalData.WebUrl + 'contract/update/';
-    }
-    //提交
-    wx.request({
-      url: _url,
-      data: {
-        contractAddTime: that.data.contractAddTime,
-        contractAuthorize: e.detail.value.contractAuthorize,
-        contractBusiness: that.data.businessName[that.data.businessId],
-        contractMoney: e.detail.value.contractMoney,
-        contractName: e.detail.value.contractName,
-        contractNo: that.data.contractDetail.contractNo,
-        contractNote: e.detail.value.contractNote,
-        contractUserName: e.detail.value.contractUserName,
-        contractUserPhone: e.detail.value.contractUserPhone,
-        projectType: e.detail.value.projectType,
-        typeId: that.data.contractDetail.typeId,
-      },
-      header: {
-        'Authorization': "Bearer " + app.globalData.SignToken
-      },
-      method: 'POST',
-      success: function (res) {
-        //添加修改成功
-        if(res.statusCode == 200){
-          that.setData({
-            addContractShow: false
+          httpRequest.requestUrl({
+            url: "project/contract/delete",
+            params: shouddelids,
+            method: "post"
+          }).then(data => {
+            that.getContractFromApi();
           })
-          wx.showToast({
-            title: res.data.message,
-            icon:'success',
-            duration: 2000
-          });
-          that.getProjectsFromApi();
-        }
-      },
-      fail: function () {
-      },
-      complete: function () {
-      }
-    })
-  },
-
-  /**
-   *项目类型多选 
-   */
-  typeShowEvnet:function(e){
-    let projectTypesList = this.data.projectTypesList;
-    //判断
-    if(this.data.btnName == '添加'){
-      for (let ptype of projectTypesList)ptype.checked = false;
-    }
-    else{
-      if(this.data.contractDetail.projectType != '' && this.data.contractDetail.projectType != null){
-        let ptypeList = this.data.contractDetail.projectType.split(',');
-        for (let ptype of projectTypesList){
-          if(ptypeList.indexOf(ptype.name) != -1){
-            ptype.checked = true;
-          }
-          else{
-            ptype.checked = false;
-          }
         }
       }
-    }
-    this.setData({
-      projectTypesList: projectTypesList,
-      selectTypeShow : true
-    })
-
-  },
-  /**
-   * 类型多选改变
-   */
-  typeSelectEvent:function(e){
-    let tList = this.data.projectTypesList;
-    for (let tshort of tList) {
-      if (e.detail.value.indexOf(tshort.id.toString()) != -1) {
-        tshort.checked = true;
-      } else {
-        tshort.checked = false;
-      }
-    }
-    this.setData({
-      projectTypes: tList
-    })
-  },
-  /**
-   * 取消多选
-   */
-  returnTypeEvent:function(e){
-    this.setData({
-      selectTypeShow : false
     });
   },
 
-  /**
-   * 项目多选输入确认
-   */
-  setTypeEvent:function(e){
-    let projectType = '';
-    for (let pt of this.data.projectTypesList) {
-      if (pt.checked) {
-        projectType += pt.name + ',';
+  //添加合同按钮点击事件
+  addContractEvent: function (e) {
+    var dc = JSON.stringify(null);
+    wx.redirectTo({
+      url: '../../paging/editcontract/editcontract?c_no=' + null + '&detailcontract=' + dc + '&eventname=' + 'add'
+    })
+  },
+
+  //编辑合同
+  editEvent: function (e) {
+    var contractNo = Number(e.currentTarget.id);
+    var detailcontract = '';
+    for (let contract of this.data.tableList) {
+      if (contract['id'] == e.currentTarget.id) {
+        detailcontract = contract;
+        break;
       }
     }
-    if (projectType == null || projectType == '') {
-      utils.TipModel('错误' , '请选择项目类型', 0);
-      return;
+    var dc = JSON.stringify(detailcontract);
+    wx.redirectTo({
+      url: '../../paging/editcontract/editcontract?c_no=' + contractNo + '&detailcontract=' + dc + '&eventname=' + 'edit'
+    })
+  },
+  navigateToProjectManagement: function (e, flag) {
+ 
+    //项目列表信息
+    var projectUnderContractList = [];
+    var contractno = '';
+    var projectid = '';
+    var contractvalue = e.currentTarget.dataset.value;
+    var cvalue = JSON.stringify(contractvalue);
+    for (let item of this.data.tableList) {
+      if (e.currentTarget.id == item.id) {
+        projectUnderContractList = item.projectList;
+        contractno = item.contractNo;
+        projectid = item.id;
+      }
     }
-    projectType = projectType.substring(0 , projectType.length - 1 );
-    let contractDetail = this.data.contractDetail;
-    contractDetail.projectType = projectType;
-    this.setData({
-      contractDetail: contractDetail,
-      selectTypeShow: false
-    });
+    var pucL = JSON.stringify(projectUnderContractList);
+    var cn = JSON.stringify(contractno);
+    var pid = '';
+    if (flag === "add") {
+      pid = JSON.stringify('');
+    } else {
+      pid = JSON.stringify(projectid);
+    }
+    var params = {
+      page: this.data.pagination.page,
+      limit: this.data.pagination.rowsPerPage,
+      key: this.data.pagination.search,
+      sidx: 'id',
+      order: this.data.pagination.sortBy,
+      startDate: this.data.pagination.startDate,
+      endDate: this.data.pagination.endDate
+    };
+    var ps = JSON.stringify(params);
+    wx.redirectTo({
+      url: '../project-management/project-management?projectList=' + pucL + '&showContractNo=' + cn + '&showProjectId=' + pid + '&contractDetail=' + cvalue + '&listparams=' + ps
+    })
+  },
+  //查看合同下的项目列表
+  checkProjectEvent: function (e) {
+    this.navigateToProjectManagement(e, "check");
+  },
+
+  //添加项目信息
+  addProjectEvent: function (e) {
+    console.log("添加项目点击事件")
+    this.navigateToProjectManagement(e, "add");
   }
-
 })

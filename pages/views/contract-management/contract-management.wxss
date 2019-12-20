@@ -1,4 +1,5 @@
 /* pages/views/contract-management/contract-management.wxss */
+
 .mycontain{
   margin-top: 130rpx;
 }

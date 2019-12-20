@@ -30,8 +30,9 @@ Page({
     },  //分页参数
     has_next: false,  //是否有上下页
     has_pre: false,
+    postShortCutProjectNo:'',//需要提交返修的项目ID
     tableList: [],  //列表数据
-    curPro:{}, //当期项目
+    curPro:[], //被点中的需要查看的返修项目
     rshortcutList:[], //回复短语
     rNameList:[],
     rindex:0,
@@ -45,7 +46,7 @@ Page({
   onLoad: function (options) {
       this.getProjectTypesInfo();
       this.getProjectsFromApi();
-      this.getShortCutList();
+    this.getShortCutList(options);
   },
 
   /**
@@ -92,28 +93,26 @@ Page({
   /**
    *获取快捷短语 
    */
-  getShortCutList:function()
+  getShortCutList:function(e)
   {
-    var that =this;
-      wx.request({
-      url: app.globalData.WebUrl + "shortcut/13/",
-      method: 'GET',
-      header: {
-        'Authorization': "Bearer " + app.globalData.SignToken
-      },
-      success: function (res) {
-        if (res.statusCode == 200) {
-          let nameList = ['回复短语快捷输入'];
-          for (let shortcut of res.data) {
-            nameList.push(shortcut.shortNote);
-          }
-          that.setData({
-            rshortcutList: res.data,
-            rNameList: nameList
-          })
+    var that = this;
+    return new Promise((resolve, reject) => {
+      httpRequest.requestUrl({
+        url: "set/wpshortcut/getListByShortTypeId/13",
+        params: {},
+        method: "get"
+      }).then(data => {
+        let nameList = ['回复短语快捷输入'];
+        for (let shortcut of data.list) {
+          nameList.push(shortcut.shortcutNote);
         }
-      }
-    });
+        that.setData({
+          rshortcutList: data.list,
+          rNameList: nameList
+        })
+        resolve(e)
+      })
+    })
   },
   /**
    * 回复短语快捷输入
@@ -126,34 +125,42 @@ Page({
     })
   },
   /**
- * 获取项目类型
- */
-  getProjectTypesInfo: function () {
+  * 获取项目类型
+  */
+  getProjectTypesInfo: function (e) {
     var that = this;
-    //加载阶段选项
-    wx.request({
-      url: app.globalData.WebUrl + "projectTypes/",
-      method: 'GET', // OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT  
-      // 设置请求的 header  
-      header: {
-        'Authorization': "Bearer " + app.globalData.SignToken
-      },
-      success: function (res) {
-        if (res.statusCode == 200) {
-          var stagesInfo = ['所有类型'];
-          for (var stage of res.data) {
-            stagesInfo.push(stage.name);
-          }
-          that.setData({
-            projectTypes: stagesInfo
-          })
+    return new Promise((resolve, reject) => {
+      httpRequest.requestUrl({
+        url: "set/projecttype/getProjectTypelist",
+        params: {},
+        method: "get"
+      }).then(data => {
+        var stagesInfo = ['所有类型'];
+        for (var stage of data.list) {
+          stagesInfo.push(stage.name);
         }
-
-      },
-      fail: function (res) {
-
-      }
+        that.setData({
+          projectTypes: stagesInfo
+        })
+        resolve(e)
+      })
     })
+  },
+  /**
+ * 类型改变
+ */
+  ProTypeChangeEvent: function (e) {
+    var pagination = this.data.pagination;
+    if (e.detail.value == 0) {
+      pagination.search = '';
+    } else {
+      pagination.search = this.data.projectTypes[e.detail.value];
+    }
+    this.setData({
+      projectTypeID: e.detail.value,
+      pagination: pagination
+    })
+    this.getProjectsFromApi();
   },
   /**
    * 项目立项列表
@@ -219,22 +226,7 @@ Page({
       dateInfo: endDate
     });
   },
-  /**
-   * 类型改变
-   */
-  ProTypeChangeEvent: function (e) {
-    var pagination = this.data.pagination;
-    if (e.detail.value == 0) {
-      pagination.search = '';
-    } else {
-      pagination.search = this.data.projectTypes[e.detail.value];
-    }
-    this.setData({
-      projectTypeID: e.detail.value,
-      pagination: pagination
-    })
-    this.getProjectsFromApi();
-  },
+ 
   /**
    * 日历事件
    */
@@ -364,20 +356,26 @@ Page({
     });   
 
   },
+
   /**
    * 返修事件
    */
   backClickEvent:function(e){
-    for(let pro of this.data.tableList){
-      if(pro['id'] == e.currentTarget.id){
-        this.setData({
-          curPro: pro,
+    var projectNo = e.currentTarget.dataset.value;
+    var that = this;
+    return new Promise((resolve, reject) => {
+      httpRequest.requestUrl({
+        url: "project/backwork/list/" + projectNo,
+        method: "get"
+      }).then(data => {
+        this.getProjectsFromApi();
+        that.setData({
+          curPro: data.list,
           backShow: true
         });
-        break;
-      }
-    }
-
+        resolve(e)
+      })
+    })
   },
   /**
    * 返修编辑事件
@@ -417,55 +415,53 @@ Page({
    */
   postShortCutEvent:function(e){
     var that = this;
-    if(that.data.executes == ''){
-      utils.TipModel('错误', '请填写回复短语',0);
+    if (that.data.executes == '') {
+      utils.TipModel('错误', '请填写回复短语', 0);
       return;
     }
-    //提交短语
-    wx.request({
-      method: 'POST',
-      url: app.globalData.WebUrl + 'addNote/',
-      header: {
-        Authorization: "Bearer " + app.globalData.SignToken
-      },
-      data: {
-        back_id: that.data.backId,
-        note: that.data.executes
-      },
-      success: function (res) {
-        if (res.statusCode == 200) {
-          that.postToQuality();
-        }
-      }
-    });  
+    return new Promise((resolve, reject) => {
+      httpRequest.requestUrl({
+        url: "project/backwork/update",
+        params: {
+          id: this.data.backId,
+          projectNo: this.data.postShortCutProjectNo,
+          submitNote: this.data.executes,
+          backStage: 1,
+        },
+        method: "post"
+      }).then(data => {
+        utils.TipModel('提示', "返修意见提交成功");
+        this.getProjectsFromApi();
+        that.setData({
+          backEditShow: false
+        })
+        resolve(e)
+      })
+    })   
   },
-  /**
-   * 提交至质量检查
-   */
-  postToQuality:function(){
-    let that = this;
-    wx.request({
-      method: 'POST',
-      url: app.globalData.WebUrl + 'project/stage/',
-      header: {
-        Authorization: "Bearer " + app.globalData.SignToken
-      },
-      data: {
-        projectNo: that.data.curPro['projectNo'],
-        projectStage: 4
-      },
-      success: function (res) {
-        if (res.statusCode == 200) {
-          utils.TipModel('提示', res.data.message);
-          that.setData({
-            backEditShow: false,
-            backShow: false,
-            executes: ''
-          })
-          that.getProjectsFromApi();
-        }
-      }
-    });  
+
+//修改作业状态
+  stopOrStartProjectStatus:function(e){
+    var that = this;
+    var projectid = Number(e.currentTarget.id);
+    var projectno = e.currentTarget.dataset.projectNo;
+    //状态标识值
+    var projectStatus = e.currentTarget.dataset.projectStatus;
+    return new Promise((resolve, reject) => {
+      httpRequest.requestUrl({
+        url: "project/work/updateStatus",
+        params: {
+          'id': projectid,
+          'projectNo': projectno,
+          'projectStatus': projectStatus
+        },
+        method: "post"
+      }).then(data => {
+        utils.TipModel('提示', "修改作业状态成功");
+        this.getProjectsFromApi();
+        resolve(e)
+      })
+    }) 
   }
 
 })

@@ -15,32 +15,7 @@ Component({
    */
   data: {
     showModalStatus: false,
-    //项目管理列表
-    pmcate_list:[{
-      id:'project-management',
-      name:'项目处理',
-      url:'../../views/project-management/project-management',
-      selected:false,
-      visiable: true
-    },{
-        id: 'schedule-management',
-        name: '项目进度',
-        url: '../../views/schedule-management/schedule-management',
-        selected: false,
-        visiable: true
-    },{
-        id: 'project-output',
-        name: '项目产值',
-        url: '../../views/project-output/project-output',
-        selected: false,
-        visiable: true
-    },{
-        id: 'recycle-management',
-        name: '项目回收站',
-        url: '../../views/recycle-management/recycle-management',
-        selected: false,
-        visiable: true
-    }],
+ 
     //项目流程列表
     ppcate_list: [{
       id: 'contract-management',
@@ -48,13 +23,7 @@ Component({
       url: '../../views/contract-management/contract-management',
       selected: false,
       visiable: true
-    }, {
-        id: 'projectsetup-management',
-        name: '项目立项',
-        url: '../../views/projectsetup-management/projectsetup-management',
-        selected: false,
-        visiable: true
-    }, {
+    },  {
         id: 'allocation-management',
         name: '项目安排',
         url: '../../views/allocation-management/allocation-management',
@@ -68,38 +37,23 @@ Component({
         visiable: true
       }, {
         id: 'quality-management',
+        //对应 质检人员
         name: '质量检查',
         url: '../../views/quality-management/quality-management',
         selected: false,
         visiable: true
       }, {
         id: 'output-management',
+        //对应 产值核算员
         name: '产值核算',
         url: '../../views/output-management/output-management',
         selected: false,
         visiable: true
-      }, {
+      },{
         id: 'authorize-management',
+        //对应 项目审定员
         name: '项目审定',
         url: '../../views/authorize-management/authorize-management',
-        selected: false,
-        visiable: true
-      }, {
-        id: 'audited-management',
-        name: '已审定',
-        url: '../../views/audited-management/audited-management',
-        selected: false,
-        visiable: true
-      }, {
-        id: 'schedule-management',
-        name: '项目状态',
-        url: '../../views/schedule-management/schedule-management',
-        selected: false,
-        visiable: true
-      }, {
-        id: 'project-output',
-        name: '项目产值',
-        url: '../../views/project-output/project-output',
         selected: false,
         visiable: true
       }, {
@@ -131,19 +85,14 @@ Component({
       }
     ],
 
-    mcontent: [],
     pcontent: [],
     scontent:[],
-    //项目管理列表是否展开
-    pmopen:false,
-    pmImgUrl: "/images/triup.png",
     //项目流程列表是否展开
     ppopen: false,
     ppImgUrl: "/images/triup.png",
     //统计列表是否展开
     stopen:false,
     stImgUrl:"/images/triup.png",
-
     active: true,
     
 
@@ -153,46 +102,27 @@ Component({
      * 生命周期函数--页面初始化
      */
   ready: function (options) {
-    let pmcate_list = this.data.pmcate_list;
     let ppcate_list = this.data.ppcate_list;
     let stcate_list = this.data.stcate_list;
     let permissionsList = app.globalData.permissions;
-    pmcate_list[0].visiable = (permissionsList.indexOf('project:contract:list') != -1);
-    pmcate_list[1].visiable = (permissionsList.indexOf('project:project:save') != -1);
-    pmcate_list[2].visiable = (permissionsList.indexOf('project:manage:list') != -1);
-    pmcate_list[3].visiable = (permissionsList.indexOf('project:project:plan') != -1);
-    ppcate_list[0].visiable = (permissionsList.indexOf('project_contract') != -1);
-    ppcate_list[1].visiable = (permissionsList.indexOf('put_project') != -1);
-    ppcate_list[2].visiable = (permissionsList.indexOf('project:project:plan') != -1);
-    ppcate_list[3].visiable = (permissionsList.indexOf('project:work:list') != -1);
-    ppcate_list[4].visiable = (permissionsList.indexOf('inspect_quality') != -1);
-    ppcate_list[5].visiable = (permissionsList.indexOf('adjust_output') != -1);
-    ppcate_list[6].visiable = (permissionsList.indexOf('leader_authorize') != -1);
-    ppcate_list[7].visiable = (permissionsList.indexOf('authorized') != -1);
-    ppcate_list[8].visiable = (permissionsList.indexOf('project_schedule') != -1);
-    ppcate_list[9].visiable = (permissionsList.indexOf('start_project') != -1);
-    ppcate_list[10].visiable = (permissionsList.indexOf('get_recycler') != -1);
+    //可视标识符判断
+    ppcate_list[0].visiable = (permissionsList.indexOf('project:contract:list') != -1);
+    ppcate_list[1].visiable = (permissionsList.indexOf('project:project:plan') != -1);
+    ppcate_list[2].visiable = (permissionsList.indexOf('project:work:list') != -1);
+    ppcate_list[3].visiable = (permissionsList.indexOf('project:quality:list') != -1);
+    ppcate_list[4].visiable = (permissionsList.indexOf('project:checkoutput:list') != -1);
+    ppcate_list[5].visiable = (permissionsList.indexOf('project:authorize:list') != -1);
+    ppcate_list[6].visiable = (permissionsList.indexOf('project:recycle:list') != -1);
     stcate_list[0].visiable = (permissionsList.indexOf('project:chartoutput') != -1);
     stcate_list[1].visiable = (permissionsList.indexOf('project:chartcollect') != -1);
     stcate_list[2].visiable = (permissionsList.indexOf('finance:servicechart') != -1);
     this.setData({
-      pmcate_list: pmcate_list,
       ppcate_list: ppcate_list,
       stcate_list: stcate_list
     })
-
-    var pmcatelist = this.data.pmcate_list;
     var ppcatelist = this.data.ppcate_list;
     var stcatelist = this.data.stcate_list;
-    for (var pm of pmcatelist) {
-      if (pm.id == this.properties.urlId){
-        pm.selected = true;
-        this.setData({
-          pmopen: true,
-          pmImgUrl: '/images/tridown.png',
-        });
-      }
-    }
+
     for (var pp of ppcatelist){
       if (pp.id == this.properties.urlId){
         pp.selected = true;
@@ -213,7 +143,6 @@ Component({
     }
 
     this.setData({
-      mcontent : pmcatelist,
       pcontent : ppcatelist,
       scontent : stcatelist
     })

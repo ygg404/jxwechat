@@ -16,15 +16,6 @@
     </view>
   </view>
   <view class='spaceAroundCenter' >
-     <!-- <view class='searchview'>
-      <picker bindchange="ProTypeChangeEvent"   value="{{projectTypeID}}" range="{{projectTypes}}">
-        <view style='width:200%;'>
-          {{projectTypes[projectTypeID]}}
-        </view>
-        <!-- <icon type='download'   ></icon> -->
-      <!-- </picker>
-      <image src='/images/down.png'></image>
-    </view> -->
     <view class='searchview' style='margin-left:30rpx;'>
       <input class='inputsearch' placeholder='关键词搜索' bindinput="searchInputEvent" value='{{pagination.search}}'></input>
       <icon type='search' style='margin-left:-32px;margin-top:15rpx;'></icon>
@@ -40,19 +31,18 @@
       <view wx:for="{{tableList}}" wx:for-item="project" >
         <view class="tr" >
             <view class='td0'>{{project.selected?'v':'>'}}</view>
-            <view class="td td1" bindtap='detailClickEvent' id="{{project.id}}">{{project.contractNo==null?'':project.contractNo}}</view>
+            <view class="td td1" bindtap='detailClickEvent' id="{{project.id}}">{{project.contractNo==null?'':project.projectNo}}</view>
             <view class="td td2">{{project.projectName}}</view>
             <view class="td td3">
-              <view><button class='delbtn' bindtap='deleteEvent' id="{{project.id}}">彻底删除</button></view>
-              <view><button class='resbtn' bindtap='restoreEvent' id="{{project.id}}">恢复</button></view>
+              <view><button class='delbtn' bindtap='deleteEvent' id="{{project.projectNo}}">彻底删除</button></view>
+              <view><button class='resbtn' bindtap='restoreEvent' data-value="{{project.projectNo}}" id="{{project.id}}">恢复</button></view>
             </view>
         </view>
         <view wx:if="{{project.selected}}">
+        <view class='tr detail'><text>项目负责人：</text><text>{{project.projectBusiness}}</text></view>
           <view class='tr detail'><text>委托单位：</text><text>{{project.projectAuthorize}}</text></view>
-          <view class='tr detail'><text>立项人：</text><text>{{project.projectSetUp}}</text></view>
-          <view class='tr detail'><text>项目负责人：</text><text>{{project.projectProduce}}</text></view>
-          <view class='tr detail'><text>项目启动时间：</text><text>{{project.projectStartTime}}</text></view>
-          <view class='tr detail'><text>项目阶段：</text><text>{{project.projectStage}}</text></view>
+          <view class='tr detail'><text>项目启动时间：</text><text>{{project.projectStartDateTime}}</text></view>
+         
         </view>
       </view>
       <view class="tr">

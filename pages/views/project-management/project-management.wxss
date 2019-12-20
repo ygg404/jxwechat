@@ -1,4 +1,4 @@
-/* pages/views/project-management/project-management.wxss */
+/* pages/views/contract-management/contract-management.wxss */
 
 .mycontain{
   margin-top: 130rpx;
@@ -40,10 +40,16 @@
   font-size: 13pt;
 }
 
+.spaceAroundCenter .searchview .addbtn{
+  width:70%;
+  background: #0ab133;
+  color: whitesmoke;
+}
+
 .spaceAroundCenter picker{
   display: flex;
   flex-flow: row wrap;
-  text-align: center;
+  /* text-align: center; */
   justify-content: flex-start;
   /* padding-left: 10rpx; */
   border-bottom: 1rpx solid rgb(40, 133, 4);
@@ -104,11 +110,11 @@
 }
 
 .th2,.td2{
-  width: 40%;
+  width: 47%;
 }
 
 .th3,.td3{
-  width: 37%;
+  width: 30%;
 
 }
 
@@ -118,13 +124,31 @@
   text-decoration:underline;
 }
 
+.td3 .delbtn{
+  line-height: 180%;
+  width: 80%;
+  height: 55rpx;
+  color: whitesmoke;
+  background: red;
+  font-size: 9pt;
+}
+
 .td3 .resbtn{
-  line-height: 200%;
+  line-height: 180%;
   width: 80%;
   height: 55rpx;
   color: whitesmoke;
   background: #15aef5;
-  font-size: 10pt;
+  font-size: 9pt;
+}
+
+.td3 .downbtn{
+  line-height: 180%;
+  width: 80%;
+  height: 55rpx;
+  color: whitesmoke;
+  background: #97ec0f;
+  font-size: 9pt;
 }
 
 .th{
@@ -158,7 +182,8 @@
 .tr button{
   margin: 20rpx;
   width: 210rpx;
-  height: 86rpx;
+  height: 80rpx;
+  line-height: 200%;
 }
 
 .tr .btnfont_has{
@@ -177,7 +202,7 @@
   margin-top: 40rpx;
 }
 
-/* 修改阶段 */
+/* 合同添加 */
 /*mask*/
 .drawer_screen {
   width: 100%;
@@ -230,13 +255,6 @@
   line-height: 200%;
 }
 
-.form .tabledetail .tdh2gray{
-  width: 70%;
-  color: gray;
-  font-size: 12pt;
-  line-height: 200%;
-}
-
 .form .tabledetail .tdh2 input{
   width: 90%;
   border-bottom:1px solid #0ab133;
@@ -275,3 +293,16 @@
   text-align: center;
   align-items: center;
 }
+
+.form .title{
+  font-size: 18pt;
+  font-weight: 700;
+}
+
+.checkGroupBox{
+  max-height: 600rpx;
+  overflow-y: scroll;
+  border: 1px solid #0ab133;
+  width: 100%;
+}
+

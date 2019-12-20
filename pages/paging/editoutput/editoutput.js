@@ -1,7 +1,6 @@
-// pages/paging/editoutput/editoutput.js
 var utils = require('../../../utils/util.js');
+var httpRequest = require('../../../utils/httpRequest.js');
 var app = getApp();
-
 Page({
 
   /**
@@ -11,8 +10,10 @@ Page({
     ptworkSelected:false,
     ptwork:{},
     p_no:'',
+    projectInfo:'',//项目信息
     workTypeList:[],  //工作类型列表
-    groupList:[],   //工作组
+    outPutGroupList:[],   //产值组列表 
+
     totalOutput: 0,  //总产值
     cutOffTime:'',   //结算时间
     multiIndex: [0, 0],  //年月选择
@@ -27,9 +28,10 @@ Page({
       p_no : options.p_no
     });
     this.initMonthDatePicker();
-    this.getProjectinfo();
-    this.getWorkTypeList();
-    this.getGroupTypeList();
+    //这里错了 需要修改
+    //this.getProjectinfo(this.data.p_no);
+    this.getWorkTypeList(options);
+    this.getOutPutGroupList(options);  
     this.getCutoffTime();
   },
 
@@ -96,8 +98,6 @@ Page({
     this.setData({
       multiArray: multiArr
     });
-
-    
   },
   /**
    * 查看项目基本信息
@@ -109,34 +109,10 @@ Page({
     })
   },
   /**
-   * 获取项目基本信息
-   */
-  getProjectinfo: function () {
-    let that = this;
-    wx.request({
-      url: app.globalData.WebUrl + "project/output/?projectNo=" + that.data.p_no ,
-      method: 'GET',
-      header: {
-        'Authorization': "Bearer " + app.globalData.SignToken
-      },
-      success: function (res) {
-        if (res.statusCode == 200) {
-          let totalOutput = 0;
-          for (let group of res.data['groupList']) {
-            let allput = 0;
-            for (let outPutWrap of group.outPutWraps) {
-                allput += outPutWrap.workLoad * outPutWrap.projectRatio * outPutWrap.typeOutput;
-            }
-            totalOutput += allput;
-            group.allPutNum = allput;
-          }
-          that.setData({
-            ptwork: res.data,
-            totalOutput: totalOutput
-          })
-        }
-      }
-    });
+     * 获取项目基本信息
+     */
+  getProjectinfo: function (p_no) {
+  
   },
   /**
 * 获取结算时间
@@ -164,46 +140,36 @@ Page({
   /**
  * 获取工作类型信息
  */
-  getWorkTypeList: function () {
-    let that = this;
-    wx.request({
-      url: app.globalData.WebUrl + "workType/",
-      method: 'GET',
-      header: {
-        'Authorization': "Bearer " + app.globalData.SignToken
-      },
-      success: function (res) {
-        if (res.statusCode == 201) {
-          that.setData({
-            workTypeList: res.data,
-           
-          })
-        }
-      }
-    });
+  getWorkTypeList: function (e) {
+    var that = this;
+    return new Promise((resolve, reject) => {
+      httpRequest.requestUrl({
+        url: "set/projecttype/getProjectTypelist",
+        method: "get"
+      }).then(data => {
+        this.setData({
+          workTypeList:data.list
+        })
+      
+        resolve(e)
+      })
+    })
   },
-  /**
-* 获取工作组类型信息
-*/
-  getGroupTypeList: function () {
-    let that = this;
-    wx.request({
-      url: app.globalData.WebUrl + "project/group/?projectNo=" + that.data.p_no,
-      method: 'GET',
-      header: {
-        'Authorization': "Bearer " + app.globalData.SignToken
-      },
-      success: function (res) {
-        if (res.statusCode == 200) {
-          for(let group of res.data){
-            group['checked'] = false;
-          }
-          that.setData({
-            groupList: res.data
-          })
-        }
-      }
-    });
+ // 获取工作组的产值核算
+  getOutPutGroupList: function (e) {
+    var that = this;
+    return new Promise((resolve, reject) => {
+      httpRequest.requestUrl({
+        url: "project/checkoutput/getOutPutGroup/" + this.data.p_no,
+        method: "get"
+      }).then(data => {
+        this.setData({
+          outPutGroupList: data.list
+        })
+
+        resolve(e)
+      })
+    })
   },
   /**
    * 工作组改变

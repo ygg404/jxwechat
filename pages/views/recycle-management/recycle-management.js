@@ -1,5 +1,5 @@
-// pages/views/recycle-management/recycle-management.js
 var utils = require('../../../utils/util.js');
+var httpRequest = require('../../../utils/httpRequest.js');
 var app = getApp();
 
 Page({
@@ -17,13 +17,12 @@ Page({
     pagination: {
       'page': 1,
       'rowsPerPage': 10,
-      'sortBy': 'contractNo',
+      'sortBy': 'id',
       'startDate': '', //开始日期
       'endDate': '',// 结束日期
       'search': '',
-      'p_stage': 2,
-      'descending': false,
-      'stageId': ''
+      'p_stage': 1,
+      'descending': true
     },  //分页参数
     has_next: false,  //是否有上下页
     has_pre: false,
@@ -34,8 +33,7 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-    this.getProjectTypesInfo();
-    this.getProjectsFromApi();
+    this.getContractFromApi();
   },
 
   /**
@@ -80,78 +78,33 @@ Page({
 
   },
 
-  /**
-   * 获取项目类型
-   */
-  getProjectTypesInfo: function () {
+  
+  getContractFromApi: function () {
     var that = this;
-    //加载阶段选项
-    wx.request({
-      url: app.globalData.WebUrl + "projectTypes/",
-      method: 'GET', // OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT  
-      // 设置请求的 header  
-      header: {
-        'Authorization': "Bearer " + app.globalData.SignToken
+    httpRequest.requestUrl({
+      url: "project/recycle/list",
+      params: {
+        page: that.data.pagination.page,
+        limit: that.data.pagination.rowsPerPage,
+        key: that.data.pagination.search,
+        sidx: 'id',
+        order: that.data.pagination.sortBy,
+        startDate: that.data.pagination.startDate,
+        endDate: that.data.pagination.endDate
       },
-      success: function (res) {
-        if (res.statusCode == 200) {
-          var stagesInfo = ['所有类型'];
-          for (var stage of res.data) {
-            stagesInfo.push(stage.name);
-          }
-          that.setData({
-            projectTypes: stagesInfo
-          })
-        }
-
-      },
-      fail: function (res) {
-
-      }
+      method: "get"
+    }).then(data => {
+      let hasPre = data.page.currPage > 1 && data.page.currPage <= data.page.totalPage
+      let hasNext = data.page.currPage < data.page.totalPage
+      that.setData({
+        tableList: data.page.list,
+        has_next: hasNext,  //是否有上下页
+        has_pre: hasPre,
+      })
     })
   },
 
-  /**
-   * 项目产值列表
-   */
-  getProjectsFromApi: function () {
-    var pagination = this.data.pagination;
-    var that = this;
-    wx.request({
-      url: app.globalData.WebUrl + "projectRecycle/",
-      method: 'GET',
-      data: {
-        page: pagination.page,
-        rowsPerPage: pagination.rowsPerPage,
-        sortBy: pagination.sortBy,
-        descending: pagination.descending,
-        search: pagination.search,
-        startDate: pagination.startDate,
-        endDate: pagination.endDate,
-        p_stage: pagination.p_stage,
-        stageId: pagination.stageId,
-        account: ''
-      },
-      // 设置请求的 header  
-      header: {
-        'Authorization': "Bearer " + app.globalData.SignToken
-      },
-      success: function (res) {
-        if (res.statusCode == 200) {
-          utils.tableListInit(res.data['data']);
-          that.setData({
-            has_next: res.data.has_next,  //是否有上下页
-            has_pre: res.data.has_prev,
-            tableList: res.data['data']
-          });
-        }
 
-      },
-      fail: function (res) {
-
-      }
-    })
-  },
 
   /**
    * 搜索关键字事件
@@ -162,7 +115,7 @@ Page({
     this.setData({
       pagination: pagination
     });
-    this.getProjectsFromApi();
+    this.getContractFromApi();
   },
 
   /**
@@ -188,22 +141,7 @@ Page({
       dateInfo: endDate
     });
   },
-  /**
-   * 类型改变
-   */
-  ProTypeChangeEvent: function (e) {
-    var pagination = this.data.pagination;
-    if (e.detail.value == 0) {
-      pagination.search = '';
-    } else {
-      pagination.search = this.data.projectTypes[e.detail.value];
-    }
-    this.setData({
-      projectTypeID: e.detail.value,
-      pagination: pagination
-    })
-    this.getProjectsFromApi();
-  },
+ 
   /**
    * 日历事件
    */
@@ -234,8 +172,7 @@ Page({
         calendarShow: false
       })
     }
-
-    this.getProjectsFromApi();
+    this.getContractFromApi();
   },
 
   /**
@@ -266,7 +203,7 @@ Page({
     this.setData({
       pagination: pagination
     });
-    this.getProjectsFromApi();
+    this.getContractFromApi();
     wx.pageScrollTo({
       scrollTop: 0
     })
@@ -281,7 +218,7 @@ Page({
     this.setData({
       pagination: pagination
     });
-    this.getProjectsFromApi();
+    this.getContractFromApi();
     wx.pageScrollTo({
       scrollTop: 0
     })
@@ -292,89 +229,47 @@ Page({
    */
   deleteEvent:function(e){
     var that = this;
-    //获取项目编号
-    let projectNo =''
-    for(let info of this.data.tableList){
-      if(info['id'] == e.currentTarget.id){
-        projectNo = info['projectNo'];
-      }
-    }
+    var delContractNo = e.currentTarget.id
     wx.showModal({
       title: '提示',
-      content: '确定要删除编号为' + projectNo  +'的项目吗？',
+      content: '此操作将永久删除编号为[' + delContractNo + ']的项目信息, 是否继续?',
       success: function (sm) {
         if (sm.confirm) {
-          // 用户点击了确定 可以调用删除方法了
-          wx.request({
-            url: app.globalData.WebUrl + "project/?projectNo=" + projectNo,
-            // 设置请求的 header  
-            header: {
-              "Content-Type": "application/x-www-form-urlencoded",
-              'Authorization': "Bearer " + app.globalData.SignToken
-            },
-            method: 'DELETE',
-            dataType: 'json',
-            success: function (res) {
-              if (res.statusCode == 200) {
-                utils.TipModel('删除成功！');
-                that.getProjectsFromApi();
-              }else{
-                utils.TipModel(res.data.message,level = 0);
-              }
-
-            },
-            fail: function (res) {
-
-            }
+          httpRequest.requestUrl({
+            url: "project/recycle/delete",
+            params: { projectNo: delContractNo},
+            method: "post"
+          }).then(data => {
+            that.getContractFromApi();
           })
-        } else if (sm.cancel) {
-          console.log('用户点击取消')
         }
       }
-    })
+    });
   },
   /**
    * 恢复
    */
   restoreEvent:function(e){
     var that = this;
-    //获取项目编号
-    let projectNo = ''
-    for (let info of this.data.tableList) {
-      if (info['id'] == e.currentTarget.id) {
-        projectNo = info['projectNo'];
-        break;
-      }
-    }
+    var restoreId = Number(e.currentTarget.id);
+    var restoreContractNo = e.currentTarget.dataset.value;
     wx.showModal({
       title: '提示',
-      content: '确定要恢复编号为' + projectNo + '的项目吗？',
+      content: '是否将恢复编号为[' + restoreId +']的项目信息?',
       success: function (sm) {
         if (sm.confirm) {
-          // 用户点击了确定
-          wx.request({
-            url: app.globalData.WebUrl + "project/recycle/?projectNo=" + projectNo + "&stageId=1",
-            method: 'POST',
-            // 设置请求的 header  
-            header: {
-              'Authorization': "Bearer " + app.globalData.SignToken
-            },
-            success: function (res) {
-              if (res.statusCode == 200) {
-                utils.TipModel('提示', res.data.message);
-                that.getProjectsFromApi();
-              }else{
-                utils.TipModel('错误', res.data.message,0);
-              }
-            },
-            fail: function (res) {
-
-            }
-          });
-        } else if (sm.cancel) {
-          console.log('用户点击取消')
+          httpRequest.requestUrl({
+            url: "/project/recycle/update",
+            params: {
+              id: restoreId, 
+              projectNo: restoreContractNo 
+              },
+            method: "post"
+          }).then(data => {
+            that.getContractFromApi();
+          })
         }
       }
-    })
+    });
   }
 })

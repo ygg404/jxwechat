@@ -1,89 +1,77 @@
-<!--pages/paging/editoutput/editoutput.wxml-->
-<view class='box'>
-  <view class='spaceAroundCenter'>
-    <view class="tr" bindtap='viewPtWorkEvent'>
-      <text>项目基本信息</text>
-      <image src="{{ptworkSelected ? '/images/tridown.png' :'/images/triup.png'}}"></image>
-    </view>
-    <view class="table"   wx:if="{{ptworkSelected}}">
-      <view class='tr detail'><text style="min-width:80px;">项目名称：</text><text>{{ptwork.projectName}}</text></view>
-      <view class='tr detail'><text style="min-width:80px;">作业内容：</text><text>{{ptwork.projectWorkNote}}</text></view>
-      <view class='tr detail'><text style="min-width:80px;">项目负责人：</text><text>{{ptwork.projectCharge}}</text></view>
-    </view>
-
-
-  </view>
-</view>
-
-<view class='box'>
-    <view class='tr outPutBox'><text class="textstyle">预计工作量: </text><text>{{ptwork.projectWorkLoad}}</text></view>
-    <view class='tr outPutBox'><text class="textstyle">作业工作量: </text><text>{{ptwork.workLoad}}</text></view>
-    <view class='tr outPutBox'><text class="textstyle">项目产值: </text><text>{{totalOutput}}</text></view>
-</view>
-
-<view class='box'>
-  <view class='tr outPutBox'>
-    <text class="textstyle">结算时间: </text>
-    <picker mode="multiSelector" class='dateinput' bindchange="cutDateChange" value="{{multiIndex}}" range="{{multiArray}}">
-          <input class='inputdate' value='{{multiArray[0][multiIndex[0]]}}-{{multiArray[1][multiIndex[1]]}}'
-          placeholder="结算时间" disabled="true"></input>
-      </picker>
-  </view>
-</view>
-<view class='box'>
-  <view class='checkBox'>
-        <view class='tr'>
-          <checkbox-group bindchange="workCheckEvent">
-            <label wx:for="{{workTypeList}}" wx:for-item="work" style='display:block;'>
-              <checkbox  value='{{work.id}}' checked="{{work.checked}}"/>{{work.typeName}}
-            </label>
-          </checkbox-group>
-        </view>
-  </view>
-</view>
-
-<view class='box'>
-  
-    <radio-group class="radio-group" bindchange="workGroupChangeEvent"> 
-    <view wx:for='{{groupList}}' wx:for-item="group" class='groupclass {{group.checked?"":"groupgray"}}'>
-      <radio checked="{{group.checked}}" value='{{group.id}}'/>{{group.gName}}
-      <view class="table" disable='{{!group.checked}}'>
-        <view class='tr'>
-          <view class='th th1'>作业类型</view>
-          <view class='th th2'>工作量单位</view>
-          <view class='th th3'>单位产值</view>
-          <view class='th th4'>难度系数</view>
-          <view class='th th5'>工作量</view>
-          <view class='th th6'>产值</view>
-        </view>
-        <view wx:for='{{ptwork.groupList}}' wx:for-item="ptworkGroupList">
-          <view wx:if="{{ptworkGroupList.id == group.id}}">
-            <view wx:for='{{ptworkGroupList.outPutWraps}}' wx:for-item="outPutWrap">
-              <view class='tr' wx:if='{{outPutWrap.check}}'>
-                <view class='td th1'>{{outPutWrap.typeName}}</view>
-                <view class='td th2'>{{outPutWrap.typeUnit}}</view>
-                <view class='td th3'>{{outPutWrap.typeOutput}}</view>
-                <view class='td th4'><input type='digit' id='{{group.id + "_" + outPutWrap.id}}' value='{{outPutWrap.projectRatio}}' bindinput='projectRatioEvent' disabled='{{!group.checked}}'></input></view>
-                <view class='td th5'><input type='digit' id='{{group.id + "_" + outPutWrap.id}}' value='{{outPutWrap.workLoad}}' bindinput='workLoadEvent' disabled='{{!group.checked}}'></input></view>
-                <view class='td th6'>{{outPutWrap.typeOutput*outPutWrap.projectRatio*outPutWrap.workLoad}}</view>
-              </view>
-            </view>
-            <view class='tr' style='font-weight:700;font-size:10pt;margin-top:10rpx;' >
-              <text>预算产值:</text><text>{{ptworkGroupList.outPutNum}}</text>
-              <text>总产值:</text><text>{{ptworkGroupList.allPutNum}}</text>
-            </view>
-          </view>
-
-        </view>
+  <!--pages/paging/editoutput/editoutput.wxml-->
+  <view class='box'>
+    <view class='spaceAroundCenter'>
+      <view class="tr" bindtap='viewPtWorkEvent'>
+        <text>项目基本信息</text>
+        <image src="{{ptworkSelected ? '/images/tridown.png' :'/images/triup.png'}}"></image>
+      </view>
+      <view class="table"   wx:if="{{ptworkSelected}}">
+        <view class='tr detail'><text style="min-width:80px;">项目名称：</text><text>{{ptwork.projectName}}</text></view>
+        <view class='tr detail'><text style="min-width:80px;">作业内容：</text><text>{{ptwork.projectWorkNote}}</text></view>
+        <view class='tr detail'><text style="min-width:80px;">项目负责人：</text><text>{{ptwork.projectCharge}}</text></view>
       </view>
 
-    </view>
-    </radio-group>
-  
-</view>
 
-<view class='tr' style='margin-bottom:20rpx;'>
-  <button class='rtbtn' bindtap='returnEvent'>返回</button>
-  <button class='savebtn' bindtap='saveEvent'>保存</button>
-  <button class='postbtn' bindtap='postEvent'>提交至审定</button>
-</view>
+    </view>
+  </view>
+
+  <view class='box'>
+      <view class='tr outPutBox'><text class="textstyle">预计工作量: </text><text>{{ptwork.projectWorkLoad}}</text></view>
+      <view class='tr outPutBox'><text class="textstyle">作业工作量: </text><text>{{ptwork.workLoad}}</text></view>
+      <view class='tr outPutBox'><text class="textstyle">项目产值: </text><text>{{totalOutput}}</text></view>
+  </view>
+
+  <view class='box'>
+    <view class='tr outPutBox'>
+      <text class="textstyle">结算时间: </text>
+      <picker mode="multiSelector" class='dateinput' bindchange="cutDateChange" value="{{multiIndex}}" range="{{multiArray}}">
+            <input class='inputdate' value='{{multiArray[0][multiIndex[0]]}}-{{multiArray[1][multiIndex[1]]}}'
+            placeholder="结算时间" disabled="true"></input>
+        </picker>
+    </view>
+  </view>
+  <view class='box'>
+    <view class='checkBox'>
+          <view class='tr'>
+            <checkbox-group bindchange="workCheckEvent">
+              <label wx:for="{{workTypeList}}" wx:for-item="work" style='display:block;'>
+                <checkbox  value='{{work.id}}' checked="{{work.checked}}"/>{{work.name}}
+              </label>
+            </checkbox-group>
+          </view>
+    </view>
+  </view>
+
+  <view class='box'>
+    
+      <radio-group class="radio-group" bindchange="workGroupChangeEvent"> 
+      <view wx:for='{{outPutGroupList}}' wx:for-item="group" class='groupclass {{group.checked?"":"groupgray"}}'>
+        <radio wx:if='{{group.checked}}' checked="{{group.checked}}" value='{{group.id}}'/>{{group.gName}}
+        <view class="table" wx:if='{{group.checked}}'>
+          <view class='tr'>
+            <view class='th th1'>作业类型</view>
+            <view class='th th2'>工作量单位</view>
+            <view class='th th3'>单位产值</view>
+            <view class='th th4'>难度系数</view>
+            <view class='th th5'>工作量</view>
+          </view>
+          <view wx:for='{{group.checkOutputVoList}}' wx:for-item="copvo">
+              <view wx:if='{{copvo.checked}}'> 
+                  <view class='td th1'>{{copvo.typeName}}</view>
+                  <view class='td th2'>{{copvo.unit}}</view>
+                  <view class='td th3'>{{copvo.unitOutput}}</view>
+                  <view class='td th3'>{{copvo.projectRatio}}</view>
+                  <view class='td th3'>{{copvo.workLoad}}</view>
+                </view>
+              </view>
+        </view>
+      </view>
+      </radio-group>
+    
+  </view>
+
+  <view class='tr' style='margin-bottom:20rpx;'>
+    <button class='rtbtn' bindtap='returnEvent'>返回</button>
+    <button class='savebtn' bindtap='saveEvent'>保存</button>
+    <button class='postbtn' bindtap='postEvent'>提交至审定</button>
+  </view>

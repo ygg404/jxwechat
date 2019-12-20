@@ -49,8 +49,8 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
-    // this.getProjectTypesInfo();
-    this.getProjectsFromApi();
+    this.getProjectTypesInfo(null);
+    this.getProjectsFromApi(null);
   },
 
   /**
@@ -76,38 +76,32 @@ Page({
   /**
 * 获取项目类型
 */
-  getProjectTypesInfo: function () {
+  getProjectTypesInfo: function (e) {
     var that = this;
-    //加载阶段选项
-    wx.request({
-      url: app.globalData.WebUrl + "projectTypes/",
-      method: 'GET', // OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT  
-      // 设置请求的 header  
-      header: {
-        'Authorization': "Bearer " + app.globalData.SignToken
-      },
-      success: function (res) {
-        if (res.statusCode == 200) {
-          var stagesInfo = ['所有类型'];
-          for (var stage of res.data) {
-            stagesInfo.push(stage.name);
-          }
-          that.setData({
-            projectTypes: stagesInfo
-          })
+    return new Promise((resolve, reject) => {
+      httpRequest.requestUrl({
+        url: "set/projecttype/getProjectTypelist",
+        params: {},
+        method: "get"
+      }).then(data => {
+        var stagesInfo = ['所有类型'];
+        for (var stage of data.list) {
+          stagesInfo.push(stage.name);
         }
-
-      },
-      fail: function (res) {
-
-      }
+        that.setData({
+          projectTypes: stagesInfo
+        })
+        resolve(e)
+      })
     })
   },
+
   /**
    * 项目管理列表
    */
-  getProjectsFromApi: function () {
+  getProjectsFromApi: function (e) {
     var that = this;
+    return new Promise((resolve, reject) => {
     httpRequest.requestUrl({
       url: "/project/manage/page",
       params: {
@@ -130,6 +124,8 @@ Page({
         has_pre: hasPre,
       })
     })
+      resolve(e)
+  })
   },
 
   /**

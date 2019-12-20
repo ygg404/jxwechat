@@ -1,5 +1,6 @@
-// pages/views/authorize-management/authorize-management.js
+// pages/views/projectwork-management/projectwork-management.js
 var utils = require('../../../utils/util.js');
+var httpRequest = require('../../../utils/httpRequest.js');
 var app = getApp();
 
 Page({
@@ -8,12 +9,14 @@ Page({
    * 页面的初始数据
    */
   data: {
-    urlId: 'authorize-management',
+    urlId: 'projectwork-management',
     calendarShow: false,    //日历显示
     setStartflag: false, //设置开始日期标志
-    projectTypes: [],  //类型选择
-    projectTypeID: 0,
+    backShow: false,  //返修显示
+    backEditShow: false, //返修编辑显示
     dateInfo: '',
+    projectTypes: [],  //阶段选择
+    projectTypeID: 0,
     pagination: {
       'page': 1,
       'rowsPerPage': 10,
@@ -22,19 +25,27 @@ Page({
       'endDate': utils.formatDate(new Date()),// 结束日期
       'search': '',
       'p_stage': 1,
-      'stageId': 6,
-      'descending': true
+      'descending': true,
+      'stageId': 3
     },  //分页参数
     has_next: false,  //是否有上下页
     has_pre: false,
-    tableList: []  //列表数据
+    tableList: [],  //列表数据
+    curPro: {}, //当期项目
+    rshortcutList: [], //回复短语
+    rNameList: [],
+    rindex: 0,
+    backId: '',
+    executes: ''  //回复内容
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-
+    this.getProjectTypesInfo();
+    this.getProjectsFromApi();
+    this.getShortCutList();
   },
 
   /**
@@ -48,8 +59,7 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
-    this.getProjectTypesInfo();
-    this.getProjectsFromApi();
+    this.onLoad();
   },
 
   /**
@@ -79,10 +89,44 @@ Page({
   onReachBottom: function () {
 
   },
-
   /**
-* 获取项目类型
-*/
+   *获取快捷短语 
+   */
+  getShortCutList: function () {
+    var that = this;
+    wx.request({
+      url: app.globalData.WebUrl + "shortcut/13/",
+      method: 'GET',
+      header: {
+        'Authorization': "Bearer " + app.globalData.SignToken
+      },
+      success: function (res) {
+        if (res.statusCode == 200) {
+          let nameList = ['回复短语快捷输入'];
+          for (let shortcut of res.data) {
+            nameList.push(shortcut.shortNote);
+          }
+          that.setData({
+            rshortcutList: res.data,
+            rNameList: nameList
+          })
+        }
+      }
+    });
+  },
+  /**
+   * 回复短语快捷输入
+   */
+  rshotrcutChangeEvent: function (e) {
+    let executes = e.detail.value == 0 ? '' : this.data.rNameList[e.detail.value];
+    this.setData({
+      tindex: e.detail.value,
+      executes: executes
+    })
+  },
+  /**
+ * 获取项目类型
+ */
   getProjectTypesInfo: function () {
     var that = this;
     //加载阶段选项
@@ -111,44 +155,31 @@ Page({
     })
   },
   /**
-   * 项目审定列表
+   * 项目立项列表
    */
   getProjectsFromApi: function () {
-    var pagination = this.data.pagination;
     var that = this;
-    wx.request({
-      url: app.globalData.WebUrl + "projectSetUp/",
-      method: 'GET',
-      data: {
-        page: pagination.page,
-        rowsPerPage: pagination.rowsPerPage,
-        sortBy: pagination.sortBy,
-        descending: pagination.descending,
-        search: pagination.search,
-        startDate: pagination.startDate,
-        endDate: pagination.endDate,
-        p_stage: pagination.p_stage,
-        stageId: pagination.stageId,
-        account: ''
+    httpRequest.requestUrl({
+      url: "/project/manage/page",
+      params: {
+        page: that.data.pagination.page,
+        limit: that.data.pagination.rowsPerPage,
+        key: that.data.pagination.search,
+        sidx: that.data.pagination.sidx,
+        order: 'desc',
+        startDate: that.data.pagination.startDate,
+        endDate: that.data.pagination.endDate,
+        dateItemId: 0
       },
-      // 设置请求的 header  
-      header: {
-        'Authorization': "Bearer " + app.globalData.SignToken
-      },
-      success: function (res) {
-        if (res.statusCode == 200) {
-          utils.tableListInit(res.data['data']);
-          that.setData({
-            has_next: res.data.has_next,  //是否有上下页
-            has_pre: res.data.has_prev,
-            tableList: res.data['data']
-          });
-        }
-
-      },
-      fail: function (res) {
-
-      }
+      method: "get"
+    }).then(data => {
+      let hasPre = data.page.currPage > 1 && data.page.currPage <= data.page.totalPage
+      let hasNext = data.page.currPage < data.page.totalPage
+      that.setData({
+        tableList: data.page.list,
+        has_next: hasNext,  //是否有上下页
+        has_pre: hasPre,
+      })
     })
   },
 
@@ -266,6 +297,9 @@ Page({
       pagination: pagination
     });
     this.getProjectsFromApi();
+    wx.pageScrollTo({
+      scrollTop: 0
+    })
   },
 
   /**
@@ -278,18 +312,167 @@ Page({
       pagination: pagination
     });
     this.getProjectsFromApi();
+    wx.pageScrollTo({
+      scrollTop: 0
+    })
   },
   /**
-   * 编辑
+   *编辑事件 
    */
-  editClickEvent:function(e){
-    for(let project of this.data.tableList){
-      if(project['id'] == e.currentTarget.id){
+  editClickEvent: function (e) {
+    let curPro = {};
+    for (let project of this.data.tableList) {
+      if (project['id'] == e.currentTarget.id) {
+        curPro = project;
         wx.navigateTo({
-          url: '../../paging/editauthorize/editauthorize?p_no='+ project['projectNo'],
+          url: '../../paging/editwork/editwork?p_no=' + curPro['projectNo'] + '&p_group=' + curPro['groupId'] + '&p_name=' + curPro['projectName'],
         });
         break;
       }
     }
+  },
+  /**
+ *修改状态事件 
+ */
+  saveClickEvent: function (e) {
+    let curPro = {};
+    for (let project of this.data.tableList) {
+      if (project['id'] == e.currentTarget.id) {
+        curPro = project;
+        break;
+      }
+    }
+    var that = this;
+    //提交
+    wx.request({
+      method: 'POST',
+      url: app.globalData.WebUrl + 'projectWork/update/',
+      header: {
+        Authorization: "Bearer " + app.globalData.SignToken
+      },
+      data: {
+        projectStage: curPro.workStage == 0 ? 1 : 0,
+        projectNo: curPro.projectNo
+      },
+      success: function (res) {
+        if (res.statusCode == 200) {
+          utils.TipModel('提示', res.data.message);
+          that.getProjectsFromApi();
+        }
+      }
+    });
+
+  },
+  /**
+   * 返修事件
+   */
+  backClickEvent: function (e) {
+    for (let pro of this.data.tableList) {
+      if (pro['id'] == e.currentTarget.id) {
+        this.setData({
+          curPro: pro,
+          backShow: true
+        });
+        break;
+      }
+    }
+
+  },
+  /**
+   * 编辑事件
+   */
+  editEvent: function (e) {
+    var projectInfo = e.currentTarget.dataset.value;
+    let projectNo = ''
+    for (let project of this.data.tableList) {
+      if (project['id'] == e.currentTarget.id) {
+        projectNo = project['projectNo'];
+        break;
+      }
+    }
+    var pi = JSON.stringify(projectInfo);
+    wx.navigateTo({
+      url: '../../paging/editquality/editquality?p_no=' + projectNo + '&projectInfo=' + pi
+    })
+  },
+  /**
+   * 取消
+   */
+  returnBackEvent: function (e) {
+    this.setData({
+      backShow: false
+    })
+  },
+  /**
+   * 取消恢复短语
+   */
+  returnShortCutEvent: function (e) {
+    this.setData({
+      backEditShow: false
+    })
+  },
+  /**
+   * 回复短语输入
+   */
+  executesInputEvent: function (e) {
+    this.setData({
+      executes: e.detail.value
+    })
+  },
+  /**
+   * 提交回复短语
+   */
+  postShortCutEvent: function (e) {
+    var that = this;
+    if (that.data.executes == '') {
+      utils.TipModel('错误', '请填写回复短语', 0);
+      return;
+    }
+    //提交短语
+    wx.request({
+      method: 'POST',
+      url: app.globalData.WebUrl + 'addNote/',
+      header: {
+        Authorization: "Bearer " + app.globalData.SignToken
+      },
+      data: {
+        back_id: that.data.backId,
+        note: that.data.executes
+      },
+      success: function (res) {
+        if (res.statusCode == 200) {
+          that.postToQuality();
+        }
+      }
+    });
+  },
+  /**
+   * 提交至质量检查
+   */
+  postToQuality: function () {
+    let that = this;
+    wx.request({
+      method: 'POST',
+      url: app.globalData.WebUrl + 'project/stage/',
+      header: {
+        Authorization: "Bearer " + app.globalData.SignToken
+      },
+      data: {
+        projectNo: that.data.curPro['projectNo'],
+        projectStage: 4
+      },
+      success: function (res) {
+        if (res.statusCode == 200) {
+          utils.TipModel('提示', res.data.message);
+          that.setData({
+            backEditShow: false,
+            backShow: false,
+            executes: ''
+          })
+          that.getProjectsFromApi();
+        }
+      }
+    });
   }
+
 })

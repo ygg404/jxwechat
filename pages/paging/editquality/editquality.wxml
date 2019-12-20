@@ -6,13 +6,15 @@
       <image src="{{ptworkSelected ? '/images/tridown.png' :'/images/triup.png'}}"></image>
     </view>
     <view class="table"   wx:if="{{ptworkSelected}}">
-      <view class='tr detail'><text>项目名称：</text><text>{{ptwork.projectPlan.projectName}}</text></view>
-      <view class='tr detail'><text>上交资料：</text><text>{{ptwork.projectWork.dataName}}</text></view>
-      <view class='tr detail'><text>业务负责人：</text><text>{{ptwork.projectWork.projectBusiness}}</text></view>
-      <view class='tr detail'><text>委托单位：</text><text>{{ptwork.projectPlan.projectAuthorize}}</text></view>
-      <view class='tr detail'><text>委托要求：</text><text>{{ptwork.projectPlan.projectNote}}</text></view>
-      <view class='tr detail'><text>作业内容：</text><text>{{ptwork.projectPlan.projectWorkNote}}</text></view>
-      <view class='tr detail'><text>工作小结：</text><text>{{ptwork.projectWork.briefSummary}}</text></view>
+      <view class='tr detail'><text>项目名称：</text><text>{{detailProjectInfo.projectName}}</text></view>
+      <view class='tr detail'><text>上交资料：</text><text>{{detailProjectInfo.dataName}}</text></view>
+      <view class='tr detail'><text>业务负责人：</text><text>{{detailProjectInfo.contractBusiness}}</text></view>
+      <view class='tr detail'><text>项目负责人：</text><text>{{detailProjectInfo.projectCharge}}</text></view>
+      <view class='tr detail'><text>委托单位：</text><text>{{detailProjectInfo.projectAuthorize}}</text></view>
+      <view class='tr detail'><text>委托要求：</text><text>{{detailProjectInfo.projectNote}}</text></view>
+      <view class='tr detail'><text>工作内容：</text><text>{{detailProjectInfo.workNote}}</text></view>
+       <view class='tr detail'><text>工作要求：</text><text>{{detailProjectInfo.workRequire}}</text></view>
+      <view class='tr detail'><text>工作小结：</text><text>{{detailProjectInfo.briefSummary}}</text></view>
     </view>
     <view class="tr" bindtap='viewBackEvent'>
       <text>返修记录</text>
@@ -20,8 +22,16 @@
     </view>
     <view class="table"  wx:if="{{backSelected}}">
       <view wx:for="{{backList}}" wx:for-item="back" >
+       <view class="tr">
+         <view class='th0'></view>
+          <view class="th th1">返修日期</view>
+          <view class="th th2">返修要求</view>
+          <view class="th th3">返修说明</view>
+        </view>
         <view class="tr detail" style='font-size:10pt;'>
-          {{back.backNote}}
+       <view class="th th1">{{back.backCreateTime}}</view>
+          <view class="th th2">{{back.backCreateTime}}</view>
+          <view class="th th3">{{back.submitNote}}</view>
         </view>
       </view>
     </view>
@@ -61,9 +71,8 @@
 
 <view class='tr'>
   <button class='returnbtn' bindtap='returnEvent'>返回</button>
-  <button class='savebtn' formType="submit">保存</button>
   <button class='posttobtn' formType="submit" id='post'>提交至核算</button>
-  <button class='addbtn' bindtap='addEvent'>退回返修</button>
+  <button class='addbtn' bindtap='repairNoteEvent'>退回返修</button>
 </view>
 </form>
 
@@ -102,7 +111,7 @@
         <view class='tr'>
           <checkbox-group bindchange="qShortCheckEvent">
             <label wx:for="{{qshortcutList}}" wx:for-item="qshort" style='display:block;'>
-              <checkbox  value='{{qshort.id}}' checked="{{qshort.checked}}"/>{{qshort.shortNote}}
+              <checkbox  value='{{qshort.id}}' checked="{{qshort.checked}}"/>{{qshort.shortcutNote}}
             </label>
           </checkbox-group>
         </view>
