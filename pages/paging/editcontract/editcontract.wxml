@@ -1,0 +1,105 @@
+<!--时间控件-->
+<calendar-component dateInfo="{{contractTime}}" wx:if="{{contractCalendarShow}}" bindshowEvent="contractCalendarEvent" bindsetEvent="contractCalendarEvent"></calendar-component>
+
+<!--项目类型选择控件-->
+<view wx:if="{{selectProjectTypeShow}}">
+  <view class='drawer_screen' style="z-Index:1002;"></view>
+  <view class='form' style="z-Index:1003;">
+    <view class='tabledetail' >
+      <view class='title'>项目类型选择</view>
+      <view class='checkGroupBox'>
+        <view class='tr'>
+          <checkbox-group bindchange="typeSelectEvent">
+            <label wx:for="{{projectTypesList}}" wx:for-item="ptype" style='display:block;'>
+              <checkbox  value='{{ptype.id}}' checked="{{ptype.checked}}"/>{{ptype.name}}
+            </label>
+          </checkbox-group>
+        </view>
+      </view>
+      <view class="tr" style='margin-top:20rpx;'>
+        <button class='returnbtn' bindtap='returnTypeEvent'>取消</button>
+        <button class='surebtn' bindtap='setTypeEvent'>确认</button>
+      </view>
+    </view>
+  </view>
+</view>
+<!--主界面-->
+<view>
+  <view class='drawer_screen'></view>
+  <view class='form'>
+    <view class='tabledetail'>
+      <form style='width:100%;' bindsubmit="formSubmit" bindreset="formReset" >
+      <view class='tr'>
+        <text style='padding:20rpx;'>{{pageTitleName}}合同</text>
+      </view>
+      <view class='tr' style='margin-top:40rpx;' >
+          <view class="tdh1">合同名称:</view>
+          <view class="tdh2"><input name="contractName"  bindblur='contractNamebindblur' value="{{contractDetail.contractName}}"></input></view>
+      </view>
+      <view class='tr'>
+          <view class="tdh1">合同编号:</view>
+          <view class="tdh2">{{contractDetail.contractNo}}</view>
+      </view>
+     
+      <view class='tr'>
+          <view class="tdh1">项目类型:</view>
+          <view class="tdh2">
+            <input name="projectType"  value="{{contractDetail.projectType}}" disabled="true"
+                 style='width:80%;border:1px solid green' bindtap="projecttypeShowEvent"></input>
+          </view>
+      </view>
+
+      <view class='tr'>
+          <view class="tdh1">合同金额:</view>
+          <view class="tdh2"><input name='contractMoney' bindblur='contractMoneybindblur' value="{{contractDetail.contractMoney}}" type='number'></input></view>
+      </view>
+      <view class='tr'>
+        <radio-group name="contracttypeId" class="radio-group" bindchange="radioChange">
+            <radio value="0" checked="{{contracttypeId==0}}" />合同委托
+            <radio value="1" checked="{{contracttypeId==1}}"/>一般委托
+        </radio-group>
+      </view>
+      <view class='tr'>
+          <view class="tdh1">委托单位:</view>
+          <view class="tdh2"><input name='contractAuthorize' bindblur='contractAuthorizebindblur'value="{{contractDetail.contractAuthorize}}"></input></view>
+      </view>
+      <view class='tr'>
+          <view class="tdh1">委托要求:</view>
+          <view class="tdh2"><input name='contractNote' bindblur='contractNotebindblur' value="{{contractDetail.contractNote}}"></input></view>
+      </view>
+      <view class='tr'>
+          <view class="tdh1">联系人:</view>
+          <view class="tdh2"><input name='contractUserName' bindblur='contractUserNamebindblur' value="{{contractDetail.userName}}"></input></view>
+      </view>
+      <view class='tr'>
+          <view class="tdh1">联系电话:</view>
+          <view class="tdh2"><input name='contractUserPhone' bindblur='contractUserPhonebindblur' value="{{contractDetail.userPhone}}"></input></view>
+      </view>
+      <view class='tr'>
+          <view class="tdh1">业务负责人:</view>
+          <view class="tdh2">            
+            <picker bindchange="businessChangeEvent"   value="{{businessId}}" range="{{businessName}}">
+              <view style='width:50%;border:1px solid green'>
+                {{business[businessId]['username']}}
+              </view>
+              <!-- <icon type='download' ></icon> -->
+            </picker>
+          </view>
+      </view>
+      <view class='tr'>
+          <view class="tdh1">签订时间:</view>
+          <view class="tdh2"><input name='contractTime' style='width:60%;border:1px solid green' 
+           value='{{contractTime}}' bindtap='contractTimeShowEvent' disabled='true' ></input></view>
+      </view>
+      <view class='tr'>
+          <button class='filebtn' bindtap='chooseFile'>选择文件</button>
+      </view>
+      <view style="font-size:8pt;max-width:100%;">{{contractDetail.fileName==null?'':contractDetail.fileName}}</view>
+      <view class="tr" style='margin-top:20rpx;'>
+        <button class='returnbtn' bindtap='returnDetail'>取消</button>
+        <button class='surebtn' formType="submit">确定</button>
+      </view>
+       </form>
+    </view>
+  </view>
+</view>
