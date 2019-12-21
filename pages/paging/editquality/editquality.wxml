@@ -21,17 +21,16 @@
       <image src="{{backSelected ? '/images/tridown.png' :'/images/triup.png'}}"></image>
     </view>
     <view class="table"  wx:if="{{backSelected}}">
-      <view wx:for="{{backList}}" wx:for-item="back" >
-       <view class="tr">
-         <view class='th0'></view>
+      <view class="tr">
           <view class="th th1">返修日期</view>
           <view class="th th2">返修要求</view>
           <view class="th th3">返修说明</view>
-        </view>
+      </view>
+      <view wx:for="{{backList}}" wx:for-item="back" >
         <view class="tr detail" style='font-size:10pt;'>
-       <view class="th th1">{{back.backCreateTime}}</view>
-          <view class="th th2">{{back.backCreateTime}}</view>
-          <view class="th th3">{{back.submitNote}}</view>
+          <view class="tr th1">{{back.backCreateTime}}</view>
+          <view class="tr th2">{{back.backNote}}</view>
+          <view class="tr th3">{{back.submitNote == null? '':back.submitNote}}</view>
         </view>
       </view>
     </view>

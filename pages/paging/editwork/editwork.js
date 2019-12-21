@@ -589,8 +589,17 @@ Page({
    * 添加进度
    */
   addEvent:function(e){
-    let scheduleList = th
-    let rate = this.data.ptwork.projectRate;
+    let that = this;
+    let scheduleList = this.data.scheduleList;
+    let rate = 0;
+    for(let sched of scheduleList){
+      rate = sched.scheduleRate
+    }
+    if (rate == 100){
+      utils.TipModel("提示", "当前项目已提交，无法添加进度！",0)
+      return;
+    }
+    // let rate = this.data.ptwork.projectRate;
     this.setData({
       addScheduleShow:true,
       projectNote:'',
@@ -611,30 +620,23 @@ Page({
   schedAddEvent:function(e){
     var that = this;
     //提交
-    wx.request({
-      method: 'POST',
-      url: app.globalData.WebUrl + 'schedule/',
-      header: {
-        Authorization: "Bearer " + app.globalData.SignToken
-      },
-      data: {
-        projectName: that.data.p_name,
+    httpRequest.requestUrl({
+      url: "/project/schedule/save",
+      params: {
         projectNo: that.data.p_no,
-        projectNote: that.data.projectNote,
-        projectRate: that.data.projectRate
+        scheduleNote: that.data.projectNote,
+        scheduleRate: that.data.projectRate
       },
-      success: function (res) {
-        if (res.statusCode == 200) {
-          utils.TipModel('提示', res.data.message);
-          that.setData({
-            addScheduleShow:false
-          });
-          that.getProjectinfo();
-          that.getShortCutList();
-          that.getScheduleInfo();
-        }
-      }
-    });    
+      method: "post"
+    }).then(data => {
+      utils.TipModel('提示', "添加进度成功！");
+      that.setData({
+        addScheduleShow: false
+      });
+      that.getProjectinfo();
+      that.getShortCutList();
+      that.getScheduleInfo();
+    })
   },
   /**
    *进度条事件
