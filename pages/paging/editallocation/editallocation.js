@@ -221,7 +221,7 @@ Page({
       method: "get"
     }).then(data => {
       that.setData({
-        projectPlan: data.projectPlan,
+        projectPlan: data.projectPlan == null ? {} : data.projectPlan,
       })
     })
   },
