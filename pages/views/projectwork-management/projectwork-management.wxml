@@ -54,7 +54,7 @@
             <view class="td td2">{{project.projectName}}</view>
             <view class="td td3">
               <view><button class='resbtn' bindtap='editClickEvent' id="{{project.id}}">编辑</button></view>
-              <view><button class='resbtn' bindtap='saveClickEvent' id="{{project.id}}">修改状态</button></view>
+              <!-- <view><button class='resbtn' bindtap='saveClickEvent' id="{{project.id}}">修改状态</button></view> -->
               <view><button class='resbtn' wx:if="{{project.isCharge === 1 && project.projectStatus ===0}}" bindtap='stopOrStartProjectStatus' data-project-no="{{project.projectNo}}" data-project-status='1' id="{{project.id}}" id="{{project.id}}">暂停项目</button></view>
               <view><button class='resbtn'  wx:if="{{project.isCharge === 1 && project.projectStatus !==0}}" bindtap='stopOrStartProjectStatus' data-project-no="{{project.projectNo}}" data-project-status='0' id="{{project.id}}" id="{{project.id}}">启动项目</button></view>
               <view><button class='resbtn' wx:if="{{project.submitNote == null && project.backId != null}}"
@@ -64,7 +64,7 @@
         <view wx:if="{{project.selected}}">
           <view class='tr detail'><text>项目负责人：</text><text>{{project.projectCharge}}</text></view>
           <view class='tr detail'><text>委托单位：</text><text>{{project.projectAuthorize}}</text></view>
-          <!-- <view class='tr detail'><text>项目状态：</text><text>{{project.projectStatus == 0? "启动" : "暂停"}}</text></view> -->
+          <view class='tr detail'><text>项目进度：</text><text>{{project.scheduleRate == NULL? 0: project.scheduleRate}}%</text></view>
           <!-- <view class='tr detail'><text>项目类型：</text><text>{{project.projectType}}</text></view> -->
           <view class='tr detail'><text>启动时间：</text><text>{{project.projectStartDateTime}}</text></view>
         </view>

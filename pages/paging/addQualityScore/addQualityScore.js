@@ -1,5 +1,6 @@
 // pages/paging/addQualityScore/addQualityScore.js
 var utils = require('../../../utils/util.js');
+var httpRequest = require('../../../utils/httpRequest.js');
 var app = getApp();
 
 Page({
@@ -52,8 +53,31 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
+    let that = this;
     this.initScoreTypeList();
-    this.getFromApi();
+    this.getQualityScoreList(this.data.p_no).then(scoreList => {
+      let scoreDetailList = that.data.scoreDetailList
+      for (let scoreItem of scoreList) {
+        for (let detail of scoreDetailList) {
+          if (detail.type_id === scoreItem.typeId) {
+            detail.check_a = scoreItem.checkA
+            detail.check_b = scoreItem.checkB
+            detail.check_c = scoreItem.checkC
+            detail.check_d = scoreItem.checkD
+            detail.score = (scoreItem.checkA === '' ? 0 : scoreItem.checkA) * 42 
+              + (scoreItem.checkB === '' ? 0 : scoreItem.checkB * 12)
+              + (scoreItem.checkC === '' ? 0 : scoreItem.checkC * 4)
+              + (scoreItem.checkD === '' ? 0 : scoreItem.checkD * 1)
+            detail.check_result = scoreItem.checkResult
+            detail.check_type = scoreItem.checkType
+          }
+        }
+      }
+      that.setData({
+        scoreDetailList: scoreDetailList
+      })
+      that.deductScore()
+    })
   },
 
   /**
@@ -189,39 +213,18 @@ Page({
       scoreDetailList: scoreDetailList
     });
   },
-  /**
-   * 获取评分明细
-   */
-  getFromApi:function(){
-    var that = this;
-    wx.request({
-      url: app.globalData.WebUrl + "project/quality/?projectNo=" + that.data.p_no,
-      method: 'GET',
-      header: {
-        'Authorization': "Bearer " + app.globalData.SignToken
-      },
-      success: function (res) {
-        if (res.statusCode == 201) {
-          let scoreDetailList = that.data.scoreDetailList;
-          for(let data of res.data)
-            for(let scoreDetail of scoreDetailList){
-              if (scoreDetail.type_id == data.type_id){
-                scoreDetail.check_a = data.check_a;
-                scoreDetail.check_b = data.check_b;
-                scoreDetail.check_c = data.check_c;
-                scoreDetail.check_d = data.check_d;
-                scoreDetail.check_result = data.check_result;
-                scoreDetail.check_type = data.check_type;
-                scoreDetail.score = scoreDetail.check_a * 42 + scoreDetail.check_b * 12 + scoreDetail.check_c * 4 + scoreDetail.check_d * 1;
-            }
-          }
-          that.setData({
-            scoreDetailList: scoreDetailList
-          })
-          that.deductScore();
-        }
-      }
-    });
+  // 根据项目编号获取质量评分列表
+  getQualityScoreList(projectNo) {
+    let that = this
+    return new Promise((resolve, reject) => {
+      httpRequest.requestUrl({
+        url: "project/qualityscore/list/" ,
+        method: "get",
+        params:{ 'projectNo': projectNo }
+      }).then(data => {
+        resolve(data.list)
+      })
+    })
   },
   /**扣分统计 */
   deductScore:function(){
@@ -230,20 +233,21 @@ Page({
     let cgScore = 0;  //成果质量扣分
     for(let scoreDetail of this.data.scoreDetailList){
       if(scoreDetail.type_id>0 && scoreDetail.type_id<5){
-        kjScore += scoreDetail.score;
+        kjScore += scoreDetail.score ;
       }
       if (scoreDetail.type_id >= 5 && scoreDetail.type_id < 11) {
         cjScore += scoreDetail.score;
       }
       if (scoreDetail.type_id >= 11 && scoreDetail.type_id < 16) {
-        cgScore += scoreDetail.score;
+        cgScore += scoreDetail.score ;
       }
     }
+    console.log(cgScore)
     this.setData({
       kjScore: kjScore, //空间扣分
       cjScore: cjScore,   //采集扣分
       cgScore: cgScore, //成果质量扣分
-      allScore: 100 - kjScore - cjScore - cgScore
+      allScore: (100 - kjScore * 0.3 - cjScore * 0.4 - cgScore * 0.3).toFixed(2)
     })
   },
   /**
@@ -259,37 +263,41 @@ Page({
    */
   postEvent:function(e){
     var that = this;
-    let index = 0;
-    let len = this.data.scoreDetailList.length;
-    for(let scoreDetail of this.data.scoreDetailList){
-      if (scoreDetail.check_a != "" || scoreDetail.check_b != "" || scoreDetail.check_c != "" || scoreDetail.check_d != ""
-        || scoreDetail.check_result != "" || scoreDetail.check_type != "")
-      wx.request({
-        url: app.globalData.WebUrl + "project/quality/" ,
-        method: 'POST',
-        header: {
-          'Authorization': "Bearer " + app.globalData.SignToken
-        },
-        data:{
-          check_a: scoreDetail.check_a,
-          check_b: scoreDetail.check_b,
-          check_c: scoreDetail.check_c,
-          check_d: scoreDetail.check_d,
-          check_result: scoreDetail.check_result,
-          check_type: scoreDetail.check_type,
-          project_no: that.data.p_no,
-          type_id: scoreDetail.type_id
-        },
-        success: function (res) {
-          if(res.statusCode== 200 && index>= len-1){
-
-          }
-        }
-      });
+    let scoreList = []
+    for (let detail of this.data.scoreDetailList) {
+      if (detail.check_a !== '' || detail.check_b !== '' || detail.check_c !== '' || detail.check_d !== '') {
+        scoreList.push({
+          'checkA': detail.check_a,
+          'checkB': detail.check_b,
+          'checkC': detail.check_c,
+          'checkD': detail.check_d,
+          'checkResult': detail.check_result,
+          'checkType': detail.check_type,
+          'projectNo': this.data.p_no,
+          'typeId': detail.type_id
+        })
+      }
     }
-    utils.TipModel('提示', '提交完成');
-    wx.navigateBack({
-      detla: 1
+    httpRequest.requestUrl({
+      url: "/project/qualityscore/saveList",
+      method: "post",
+      params: {
+        'scoreList': scoreList,
+        'projectNo': that.data.p_no,
+        'qualityScore': that.data.allScore
+      }
+    }).then(data => {
+      utils.TipModel('提示', '提交质量评分完成');
+      var pages = getCurrentPages();
+      let prevPage = pages[pages.length - 2]; 
+      //console.log(prevPage)
+      prevPage.setData({
+        qualityScore: that.data.allScore
+      })
+      wx.navigateBack({
+        detla: 1
+      })
     })
+    
   }
 })

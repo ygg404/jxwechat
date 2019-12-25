@@ -109,8 +109,8 @@
 
 <view class='tr'>
   <button class='returnbtn' bindtap='returnEvent'>返回</button>
-  <button class='savebtn' formType="submit">保存</button>
-  <button class='postbtn' bindtap='postEvent'>提交至质量检查</button>
+  <button class='savebtn' formType="submit">提交</button>
+  <!-- <button class='postbtn' bindtap='postEvent'>提交至质量检查</button> -->
   <button class='addbtn' bindtap='addEvent'>添加进度</button>
 </view>
 </form>
