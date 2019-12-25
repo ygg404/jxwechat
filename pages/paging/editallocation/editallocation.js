@@ -20,6 +20,7 @@ Page({
     tShortShow:false,    
     workGroupsList: [], //作业组列表
     workGroupShow: false,
+    chargeList: [],
     headManList:[],  //项目负责人列表
     headManIndex:0,
     projectInfo: '', //项目基本信息
@@ -44,20 +45,20 @@ Page({
         projectBegunDate: {
           required: true,
         },
-        projectExecuteStandard: {
+        executeStandard: {
           required: true,
         },
-        projectWorkNote: {
+        workNote: {
           required: true,
         },
-        projectWorkRequire: {
+        workRequire: {
           required: true,
         },
-        projectWorkLoad: {
+        projectWorkload: {
           required: true,
         },
 
-        projectOutPut: {
+        projectOutput: {
           required: true,
         }, projectOutputNote: {
           required: false,
@@ -73,20 +74,20 @@ Page({
         projectBegunDate: {
           required: '请填写开工时间',
         },
-        projectExecuteStandard: {
+        executeStandard: {
           required: '请填写执行标准',
         },
-        projectWorkNote: {
+        workNote: {
           required: '请填写作业内容',
         },
-        projectWorkRequire: {
+        workRequire: {
           required: '请填写技术要求',
         },
-        projectWorkLoad: {
+        projectWorkload: {
           required: '请填写工作量',
         },
 
-        projectOutPut: {
+        projectOutput: {
           required: '请填写预计产值',
         },
         projectOutputNote: {
@@ -118,6 +119,7 @@ Page({
     this.getProjectPlan();
     this.getWorkGroups();
     this.getShortCutList();
+    this.getProjectChargeList();
   },
 
   /**
@@ -180,48 +182,18 @@ Page({
  */
   getWorkGroups: function () {
     var that = this;
-    httpRequest.requestUrl({
-      url: "/project/group/getListByProjectNo/" + that.data.p_no,
-      params: {},
-      method: "get"
-    }).then(data => {
-      that.setData({
-        workGroupsList: data.list,
+    return new Promise((resolve, reject) => {
+      httpRequest.requestUrl({
+        url: "/project/group/getListByProjectNo/" + that.data.p_no,
+        params: {},
+        method: "get"
+      }).then(data => {
+        that.setData({
+          workGroupsList: data.list,
+        })
+        resolve(data)
       })
     })
-    // wx.request({
-    //   url: app.globalData.WebUrl + "workGroups/" ,
-    //   method: 'GET',
-    //   header: {
-    //     'Authorization': "Bearer " + app.globalData.SignToken
-    //   },
-    //   success: function (res) {
-    //     let manList = [];
-    //     if (res.statusCode == 200) {
-    //       for(let group of res.data){
-    //         group['checked'] = false;
-    //         for(let rate of that.data.projectDetail.rateList){
-    //           if (rate['group_id'] == group['id']){
-    //             group['output_rate'] = rate['output_rate'];
-    //             group['project_output'] = rate['project_output'];
-    //             group['shortDate'] = rate['shortDate'];
-    //             group['lastDate'] = rate['lastDate'];
-    //             group['checked'] = true;
-    //             manList.push(group['headMan']);
-    //           }
-    //         }
-            
-    //       }
-
-    //       let index = manList.indexOf(that.data.projectDetail.projectCharge);
-    //       that.setData({
-    //         workGroupsList: res.data,
-    //         headManList: manList,
-    //         headManIndex: index
-    //       });
-    //     }
-    //   }
-    // });
   },
   /**
  * 通过项目编号 获取项目基本信息
@@ -336,8 +308,8 @@ Page({
    * 工作量输入
    */
   workLoadInputEvent:function(e){
-    let projectDetail = this.data.projectDetail;
-    projectDetail['projectWorkLoad'] = e.detail.value;
+    let projectDetail = this.data.projectPlan;
+    projectDetail['projectWorkload'] = e.detail.value;
     this.setData({
       projectDetail: projectDetail
     })
@@ -346,7 +318,7 @@ Page({
    * 产值预算明细
    */
   detialInputEvent:function(e){
-    let projectDetail = this.data.projectDetail;
+    let projectDetail = this.data.projectPlan;
     projectDetail['projectOutPutNote'] = e.detail.value;
     this.setData({
       projectDetail: projectDetail
@@ -402,6 +374,16 @@ Page({
     })
   },
   /**
+  * 执行标准 改变
+  */
+  executeStandardEvent: function (e) {
+    let pDetail = this.data.projectPlan;
+    pDetail.executeStandard = e.detail.value;
+    this.setData({
+      projectPlan: pDetail
+    })
+  },
+  /**
  * 作业内容标准短语快捷输入多选
  */
   workShortShowEvent: function (e) {
@@ -450,7 +432,16 @@ Page({
       wShortShow: false
     });
   },
-
+  /**
+   * 作业短语 改变
+   */
+  workNoteEvent:function(e){
+    let pDetail = this.data.projectPlan;
+    pDetail.workNote = e.detail.value;
+    this.setData({
+      projectPlan: pDetail
+    })
+  },
   /**
  * 技术要求标准短语
  */
@@ -502,6 +493,16 @@ Page({
     });
   },
   /**
+ * 技术要求 改变
+ */
+  workRequireEvent: function (e) {
+    let pDetail = this.data.projectPlan;
+    pDetail.workRequire = e.detail.value;
+    this.setData({
+      projectPlan: pDetail
+    })
+  },
+  /**
    * 选择作业组按钮事件
    */
   chooseWorkEvent:function(e){
@@ -510,24 +511,23 @@ Page({
       utils.TipModel('错误',"请先设置并保存项目安排信息！", 0);
       return;
     }
-    this.setData({
-      workGroupShow : true
-    });
-    var headMenlist = this.data.headManList;
-    let workGroupsList = this.data.workGroupsList;
-    for (let group of workGroupsList) {
+    let headMenlist = this.data.headManList;
+    let index = 0;
+    let that = this;
+    this.getWorkGroups().then(success =>{
+      let workGroupsList = that.data.workGroupsList;
+      for (let group of workGroupsList) {
         if (group.checked) {
-          headMenlist.push(group['headMan']);
-        } else {
-          let index = headMenlist.indexOf(group['headMan']);
-          headMenlist = utils.arrayRemove(headMenlist, index);
+          index = headMenlist.indexOf(group['headMan']);
         }
-    }
-    this.setData({
-      headManList: headMenlist,
-      headManIndex: 0,
-      workGroupsList: workGroupsList
+      }
+      that.setData({
+        workGroupShow: true,
+        headManIndex: index,
+        workGroupsList: workGroupsList
+      })
     })
+
   },
   /**
    *返回 
@@ -552,107 +552,52 @@ Page({
       return false;
     }
     var that = this;
-    let pDetail = this.data.projectDetail;
+    let pDetail = this.data.projectPlan;
     //提交
-    wx.request({
-      method: 'POST',
-      url: app.globalData.WebUrl + 'projectPlan/update/',
-      header: {
-        Authorization: "Bearer " + app.globalData.SignToken
+    httpRequest.requestUrl({
+      url: "/project/plan/save",
+      params: {
+        'id': pDetail.id || undefined,
+        'projectNo': pDetail.projectNo,
+        'projectWorkload': pDetail.projectWorkload,
+        'projectWorkDate': pDetail.projectWorkDate,
+        'projectQualityDate': pDetail.projectQualityDate,
+        'projectOutput': pDetail.projectOutput,
+        'executeStandard': pDetail.executeStandard,
+        'workRequire': pDetail.workRequire,
+        'workNote': pDetail.workNote,
+        'projectWriter': that.data.projectInfo.createUserName,
+        'projectBegunDateTime': pDetail.projectBegunDateTime
       },
-      data: {
-        projectBegunDate: that.data.projectBegunDate,
-        projectCharge: pDetail['projectCharge'],
-        projectExecuteStandard: e.detail.value.projectExecuteStandard,
-        projectNo: pDetail['projectNo'],
-        projectOutPut: e.detail.value.projectOutPut,
-        projectOutPutNote: e.detail.value.projectOutPutNote,
-        projectQualityDate: e.detail.value.projectQualityDate,
-        projectWorkDate: e.detail.value.projectWorkDate,
-        projectWorkLoad: e.detail.value.projectWorkLoad,
-        projectWorkNote: e.detail.value.projectWorkNote,
-        projectWorkRequire: e.detail.value.projectWorkRequire,
-        projectWriter: app.globalData.userInfo.username,
-        rateList: pDetail['rateList']
-      },
-      success: function (res) {
-        if (res.statusCode == 200) {
-          utils.TipModel('提示',res.data.message);
-          that.onShow();
-        }
-      }
-    });
+      method: "post"
+    }).then(data => {
+      utils.TipModel('提示', '提交成功！');
+      wx.navigateBack({
+        delta: 1
+      });
+    })
   },
   /**
-   * 提交至项目作业
+   * 获取项目负责人列表
    */
-  postWorkEvent:function(e){
-    if(this.data.projectDetail.rateList.length == 0){
-      utils.TipModel('错误', '请确认好作业分组再提交至作业！',0);
-      return;
-    }
-    var that = this;
-    let pDetail = this.data.projectDetail;
-    //提交
-    wx.request({
-      method: 'POST',
-      url: app.globalData.WebUrl + 'projectPlan/update/',
-      header: {
-        Authorization: "Bearer " + app.globalData.SignToken
-      },
-      data: {
-        projectBegunDate: that.data.projectBegunDate,
-        projectCharge: pDetail['projectCharge'],
-        projectExecuteStandard: pDetail.projectExecuteStandard,
-        projectNo: pDetail['projectNo'],
-        projectOutPut: pDetail.projectOutPut,
-        projectOutPutNote: pDetail.projectOutPutNote,
-        projectQualityDate: pDetail.projectQualityDate,
-        projectWorkDate: pDetail.projectWorkDate,
-        projectWorkLoad: pDetail.projectWorkLoad,
-        projectWorkNote: pDetail.projectWorkNote,
-        projectWorkRequire: pDetail.projectWorkRequire,
-        projectWriter: app.globalData.userInfo.username,
-        rateList: pDetail['rateList']
-      },
-      success: function (res) {
-        if (res.statusCode == 200) {
-          that.stageChange();
+  getProjectChargeList() {
+    let that = this
+    return new Promise((resolve, reject) => {
+      httpRequest.requestUrl({
+        url: "/project/group/getChargeList",
+        params: {},
+        method: "get"
+      }).then(data => {
+        let headManList = []
+        for(let headman of data.list){
+          headManList.push(headman.username)
         }
-      }
-    });
-  },
-  /**
-   * 修改项目阶段
-   */
-  stageChange:function(){
-    var that = this;
-    let pDetail = this.data.projectDetail;
-    let groupsId = [];
-    for(let rate of pDetail.rateList){
-      groupsId.push(rate.group_id);
-    }
-    //提交
-    wx.request({
-      method: 'POST',
-      url: app.globalData.WebUrl + 'project/stage/',
-      header: {
-        Authorization: "Bearer " + app.globalData.SignToken
-      },
-      data: {
-        groupId: "",
-        groupsId: groupsId,
-        projectNo: pDetail.projectNo,
-        projectStage: 3
-      },
-      success: function (res) {
-        if (res.statusCode == 200) {
-          wx.navigateBack({
-            delta:1 
-          });
-        }
-      }
-    });
+        that.setData({
+          chargeList : data.list,
+          headManList: headManList
+        })
+      })
+    })
   },
   /**
    * 分组input输入变化
@@ -720,23 +665,14 @@ Page({
    * 确认分组
    */
   setGroupEvent:function(e){
-    let pDetail = this.data.projectDetail;
-    let rateList = [];
+    let pDetail = this.data.projectPlan;
     var totalrate = 0; //全占比
     var totalOutput = 0; //全产值
+    console.log(this.data.workGroupsList)
     for(let group of this.data.workGroupsList){
       if(group['checked']){
-        let g = {
-          groupName: group['gName'],
-          group_id: group['id'],
-          lastDate: group['lastDate'],
-          output_rate: group['output_rate'],
-          project_output: group['project_output'],
-          shortDate: group['shortDate']
-        };
-        rateList.push(g);
-        totalOutput += parseFloat(group['project_output']);
-        totalrate += parseFloat(group['output_rate']);
+        totalOutput += parseFloat(group['projectOutput']);
+        totalrate += parseFloat(group['outputRate']);
       }
     }
     if (totalrate > 100.01 || totalrate<99.99){
@@ -747,13 +683,29 @@ Page({
       utils.TipModel('错误', '总产值不等于预计总产值', 0);
       return;
     }
-
-    pDetail.rateList = rateList;
-    pDetail.projectCharge = this.data.headManList[this.data.headManIndex];
-    this.setData({
-      projectDetail : pDetail,
-      workGroupShow: false
+    // 获取项目负责人 ID
+    let headId = ''
+    for(let headman of this.data.chargeList){
+      if (headman.username == this.data.headManList[this.data.headManIndex]){
+        headId = headman.userId;
+      }
+    }
+    let that = this;
+    httpRequest.requestUrl({
+      url: "/project/group/saveList",
+      params: {
+        projectNo : that.data.p_no,
+        pgroupList: that.data.workGroupsList,
+        headId: headId
+      },
+      method: "post"
+    }).then(data => {
+      that.setData({
+        workGroupShow: false
+      })
+      that.onShow()
     })
+    
   },
   /**
    * 项目负责人改变
@@ -771,20 +723,17 @@ Page({
   groupCheckEvent: function(e){
     var headMenlist = this.data.headManList;
     let workGroupsList = this.data.workGroupsList;
+    let index = 0;
     for (let group of workGroupsList){
       if (group['groupId'] == e.currentTarget.id){
         group.checked = !group.checked;
-        if (group.checked){
-          headMenlist.push(group['headMan']);
-        }else{
-          let index = headMenlist.indexOf(group['headMan']);
-          headMenlist = utils.arrayRemove(headMenlist , index);
-        }
+      }
+      if (group.checked) {
+        index = headMenlist.indexOf(group['headMan']);
       }
     }
     this.setData({
-      headManList: headMenlist,
-      headManIndex:0,
+      headManIndex: index,
       workGroupsList : workGroupsList
     })
   },

@@ -229,8 +229,14 @@
         qShortShow: false
       });
     },
-
-
+    /**
+     * 质量综述修改
+     */
+    qualityNoteEvent:function(e){
+      this.setData({
+        qualityNote : e.detail.value
+      })
+    },
     //获取返修记录
     getBackListInfo: function (p_no) {
       var that = this;

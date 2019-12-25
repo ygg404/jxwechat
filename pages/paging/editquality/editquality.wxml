@@ -55,7 +55,7 @@
     </view>
 
     <view class="tr" wx:if='{{!qShortShow}}'>
-      <textarea maxlength='-1' placeholder='质量综述' name='qualityNote' value='{{qualityNote}}'></textarea>
+      <textarea maxlength='-1' placeholder='质量综述' name='qualityNote' value='{{qualityNote}}' bindinput="qualityNoteEvent" ></textarea>
     </view>
 
     <view class='tr' >

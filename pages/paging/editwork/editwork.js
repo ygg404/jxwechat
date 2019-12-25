@@ -216,6 +216,16 @@ Page({
     })
   },
   /**
+   * 技术交底 输入框改变
+   */
+  disclosureNoteEvent: function(e){
+    let projectWork = this.data.projectWork
+    projectWork.technicalDisclosureNote = e.detail.value
+    this.setData({
+      projectWork : projectWork
+    })
+  },
+  /**
      * 技术短语快捷输入取消
      */
   returnTshortEvent: function (e) {
@@ -262,6 +272,16 @@ Page({
     }
     this.setData({
       pshortcutList: pList
+    })
+  },
+  /**
+   * 过程检查 输入框改变
+   */
+  checkSuggestionEvent: function (e) {
+    let projectWork = this.data.projectWork
+    projectWork.checkSuggestion = e.detail.value
+    this.setData({
+      projectWork: projectWork
     })
   },
   /**
@@ -315,6 +335,16 @@ Page({
     })
   },
   /**
+   * 上交资料 输入框改变
+   */
+  dataNameEvent: function (e) {
+    let projectWork = this.data.projectWork
+    projectWork.dataName = e.detail.value
+    this.setData({
+      projectWork: projectWork
+    })
+  },
+  /**
      * 上交资料快捷输入取消
      */
   returnIshortEvent: function (e) {
@@ -362,6 +392,16 @@ Page({
     }
     this.setData({
       wshortcutList: wList
+    })
+  },
+  /**
+ * 工作小结 输入框改变
+ */
+  briefSummaryEvent: function (e) {
+    let projectWork = this.data.projectWork
+    projectWork.briefSummary = e.detail.value
+    this.setData({
+      projectWork: projectWork
     })
   },
   /**
@@ -413,6 +453,16 @@ Page({
     }
     this.setData({
       ashortcutList: aList
+    })
+  },
+  /**
+  * 工作量 输入框改变
+  */
+  workLoadEvent: function (e) {
+    let projectWork = this.data.projectWork
+    projectWork.workLoad = e.detail.value
+    this.setData({
+      projectWork: projectWork
     })
   },
   /**
@@ -526,65 +576,36 @@ Page({
       })
       return false;
     }
-
-    var that = this;
-    //提交
-    wx.request({
-      method: 'POST',
-      url: app.globalData.WebUrl + 'projectWork/update/',
-      header: {
-        Authorization: "Bearer " + app.globalData.SignToken
-      },
-      data: {
-        briefSummary: e.detail.value.briefSummary,
-        checkSuggestion: e.detail.value.checkSuggestion,
-        dataName: e.detail.value.dataName,
-        disclosureNote: e.detail.value.disclosureNote,
-        workLoad: e.detail.value.workLoad,
-        finishDateTime: that.data.ptwork.finishDateTime,
-        groupId: that.data.p_group,
-        projectNo: that.data.p_no,
-        
-      },
-      success: function (res) {
-        if (res.statusCode == 200) {
-            utils.TipModel('提示',res.data.message);
-
-        }
-      }
-    });
-  },
-  /**
-   * 提交至质量检查
-   */
-  postEvent:function(e){
-    if (this.data.ptwork.projectRate < 90){
-      utils.TipModel('错误','当前进度未达90%，如若已完成，请添加进度并把进度值调为90',0)
+    let schedRate = 0;
+    for (let sched of this.data.scheduleList){
+      schedRate = sched.scheduleRate
+    }
+    console.log(schedRate)
+    if (parseInt(schedRate) < 90) {
+      utils.TipModel('错误', '当前进度未达90%，如若已完成，请添加进度并把进度值调为90', 0)
       return;
     }
     var that = this;
-    //提交
-    wx.request({
-      method: 'POST',
-      url: app.globalData.WebUrl + 'project/stage/',
-      header: {
-        Authorization: "Bearer " + app.globalData.SignToken
-      },
-      data: {
-        groupId: that.data.p_group,
+    httpRequest.requestUrl({
+      url: "/project/work/" + (!this.data.projectWork.id ? 'save' : 'update'),
+      params: {
+        briefSummary: that.data.projectWork.briefSummary ,
+        checkSuggestion: that.data.projectWork.checkSuggestion,
+        dataName: that.data.projectWork.dataName,
+        id: that.data.projectWork.id || undefined,
         projectNo: that.data.p_no,
-        projectStage: 4
+        technicalDisclosureNote: that.data.projectWork.technicalDisclosureNote,
+        workLoad: that.data.projectWork.workLoad
       },
-      success: function (res) {
-        if (res.statusCode == 200) {
-          utils.TipModel('提示', res.data.message);
-          wx.navigateBack({
-            delta:1
-          })
-        }
-      }
-    });        
+      method: "post"
+    }).then(data => {
+      utils.TipModel('提示', '提交成功!');
+      wx.navigateBack({
+        delta: 1
+      })
+    })
   },
+
   /**
    * 添加进度
    */

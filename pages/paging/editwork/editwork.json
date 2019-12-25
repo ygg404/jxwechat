@@ -1,5 +1,5 @@
 {
-  "navigationBarTitleText": "项目安排",
+  "navigationBarTitleText": "项目作业编辑",
   "usingComponents": {
     "loading-component": "/pages/Components/loading-com/loading-com",
     "menu-component": "/pages/Components/menu-com/menu-com",

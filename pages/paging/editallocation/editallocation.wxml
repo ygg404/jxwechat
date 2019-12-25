@@ -23,7 +23,7 @@
         </view>
       </view>
       <view class='tr'>
-        <textarea placeholder='执行标准' name='executeStandard' value='{{projectPlan.executeStandard}}'   maxlength='-1' ></textarea>
+        <textarea placeholder='执行标准' name='executeStandard' value='{{projectPlan.executeStandard}}'  bindinput="executeStandardEvent" maxlength='-1' ></textarea>
       </view>
       <!-- 作业短语 -->
       <view class='tr'>
@@ -35,7 +35,7 @@
         </view>
       </view>
       <view class='tr'>
-        <textarea placeholder='作业内容' name='WorkNote' value='{{projectPlan.workNote}}'  maxlength='-1' ></textarea>
+        <textarea placeholder='作业内容' name='workNote' value='{{projectPlan.workNote}}' bindinput="workNoteEvent"  maxlength='-1' ></textarea>
       </view>
       <!-- 技术短语 -->
       <view class='tr'>
@@ -47,12 +47,12 @@
         </view>
       </view>
       <view class='tr'>
-        <textarea placeholder='技术要求' name='WorkRequire' value='{{projectPlan.workRequire}}' maxlength='-1' ></textarea>
+        <textarea placeholder='技术要求' name='workRequire' bindinput="workRequireEvent" value='{{projectPlan.workRequire}}' maxlength='-1' ></textarea>
       </view>
      </view>
       <view class='tr'>
           <view class="tdh1">预计工作量:</view>
-          <view class="tdh2"><input type='digit' name='WorkLoad' value='{{projectPlan.projectWorkload}}' bindinput="workLoadInputEvent" ></input></view>
+          <view class="tdh2"><input type='digit' name='projectWorkload' value='{{projectPlan.projectWorkload}}' bindinput="workLoadInputEvent" ></input></view>
       </view>
       <view class='tr'>
           <view class="tdh1">预计产值:</view>
@@ -133,8 +133,8 @@
 <view class='spaceAroundCenter'>
   <view class='tr'>
     <button class='returnbtn' bindtap='returnWorkEvent'>返回</button>
-    <button class='savebtn'  formType="submit">保存</button>
-    <button class='postbtn' bindtap='postWorkEvent'>提交至作业</button>
+    <button class='savebtn'  formType="submit">提交</button>
+    <!-- <button class='postbtn' bindtap='postWorkEvent'>提交至作业</button> -->
   </view>
 </view>
 </form>

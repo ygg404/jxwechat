@@ -55,7 +55,7 @@
       </view>
     </view>
     <view class="tr" >
-      <textarea maxlength='-1' placeholder='技术交底内容' name='disclosureNote' value='{{projectWork.technicalDisclosureNote}}'></textarea>
+      <textarea maxlength='-1' placeholder='技术交底内容' name='disclosureNote' value='{{projectWork.technicalDisclosureNote}}' bindinput="disclosureNoteEvent"></textarea>
     </view>
     <view class='tr'>
       <view class='select_box'>
@@ -66,7 +66,7 @@
       </view>
     </view>
     <view class="tr" >
-      <textarea maxlength='-1' placeholder='过程检查意见' name='checkSuggestion' value='{{projectWork.checkSuggestion}}'></textarea>
+      <textarea maxlength='-1' placeholder='过程检查意见' name='checkSuggestion' value='{{projectWork.checkSuggestion}}' bindinput="checkSuggestionEvent"></textarea>
     </view>
 
     <view class='tr'>
@@ -78,7 +78,7 @@
       </view>
     </view>
     <view class="tr" >
-      <textarea maxlength='-1' placeholder='上交资料' name='dataName' value='{{projectWork.dataName}}'></textarea>
+      <textarea maxlength='-1' placeholder='上交资料' name='dataName' value='{{projectWork.dataName}}' bindinput="dataNameEvent"></textarea>
     </view>
 
     <view class='tr'>
@@ -90,7 +90,7 @@
       </view>
     </view>
     <view class="tr" >
-      <textarea maxlength='-1' placeholder='工作小结' name='briefSummary' value='{{projectWork.briefSummary}}'></textarea>
+      <textarea maxlength='-1' placeholder='工作小结' name='briefSummary' value='{{projectWork.briefSummary}}' bindinput="briefSummaryEvent"></textarea>
     </view>
 
     <view class='tr'>
@@ -102,7 +102,7 @@
       </view>
     </view>
     <view class="tr" >
-      <textarea maxlength='-1' placeholder='工作量' name='workLoad' value='{{projectWork.workLoad}}'></textarea>
+      <textarea maxlength='-1' placeholder='工作量' name='workLoad' value='{{projectWork.workLoad}}' bindinput="workLoadEvent"></textarea>
     </view>
   </view>
 </view>
