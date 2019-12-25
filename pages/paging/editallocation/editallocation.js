@@ -160,7 +160,7 @@ Page({
       })
       return;
     }
-    let projectPlan = this.data.projectPlan
+    let projectPlan = this.data.projectPlan == null ? {} : this.data.projectPlan
     projectPlan.projectBegunDateTime = e.detail.dateInfo
     if (e.type == 'setEvent') {
       this.setData({
@@ -703,7 +703,7 @@ Page({
       that.setData({
         workGroupShow: false
       })
-      that.onShow()
+      that.getWorkGroups()
     })
     
   },
