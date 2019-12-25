@@ -9,7 +9,7 @@ Page({
    * 页面的初始数据
    */
   data: {
-    urlId: 'projectwork-management',
+    urlId: 'authorize-management',
     calendarShow: false,    //日历显示
     setStartflag: false, //设置开始日期标志
     backShow: false,  //返修显示
@@ -320,16 +320,9 @@ Page({
    *编辑事件 
    */
   editClickEvent: function (e) {
-    let curPro = {};
-    for (let project of this.data.tableList) {
-      if (project['id'] == e.currentTarget.id) {
-        curPro = project;
         wx.navigateTo({
-          url: '../../paging/editwork/editwork?p_no=' + curPro['projectNo'] + '&p_group=' + curPro['groupId'] + '&p_name=' + curPro['projectName'],
+          url: '../../paging/editauthorize/editauthorize?p_no=' + e.currentTarget.dataset.value + '&id=' + e.currentTarget.id,
         });
-        break;
-      }
-    }
   },
   /**
  *修改状态事件 
@@ -378,23 +371,7 @@ Page({
     }
 
   },
-  /**
-   * 编辑事件
-   */
-  editEvent: function (e) {
-    var projectInfo = e.currentTarget.dataset.value;
-    let projectNo = ''
-    for (let project of this.data.tableList) {
-      if (project['id'] == e.currentTarget.id) {
-        projectNo = project['projectNo'];
-        break;
-      }
-    }
-    var pi = JSON.stringify(projectInfo);
-    wx.navigateTo({
-      url: '../../paging/editquality/editquality?p_no=' + projectNo + '&projectInfo=' + pi
-    })
-  },
+
   /**
    * 取消
    */

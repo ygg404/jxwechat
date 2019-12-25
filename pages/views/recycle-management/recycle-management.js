@@ -255,7 +255,7 @@ Page({
     var restoreContractNo = e.currentTarget.dataset.value;
     wx.showModal({
       title: '提示',
-      content: '是否将恢复编号为[' + restoreId +']的项目信息?',
+      content: '是否将恢复项目编号为[' + restoreContractNo +']的项目信息?',
       success: function (sm) {
         if (sm.confirm) {
           httpRequest.requestUrl({

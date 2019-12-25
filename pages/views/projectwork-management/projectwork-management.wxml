@@ -45,10 +45,10 @@
               <view>
                 <span wx:if='{{project.isWork === 1}}' class="issetSpan">已作业</span>
                 <span wx:if='{{project.isWork != 1 && project.isWork != 2 }}' class="notsetSpan">未作业</span>
-                 <span wx:if='{{project.isWork === 2}}' class="notsetSpan">返修中</span>
+                 <span wx:if='{{project.isWork === 2}}' class="returnSpan">返修中</span>
                 
-                 <span wx:if='{{project.projectStatus === 0}}' class="issetSpan">启动</span>
-                 <span wx:if='{{project.projectStatus !== 0}}' class="notsetSpan">暂停</span>
+                 <span wx:if='{{project.projectStatus === 0}}' class="startSpan">启动</span>
+                 <span wx:if='{{project.projectStatus !== 0}}' class="stopsetSpan">暂停</span>
               </view>
             </view>
             <view class="td td2">{{project.projectName}}</view>

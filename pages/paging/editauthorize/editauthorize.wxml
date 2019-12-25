@@ -6,22 +6,19 @@
       <image src="{{ptworkSelected ? '/images/tridown.png' :'/images/triup.png'}}"></image>
     </view>
     <view style='width:100%;' wx:if="{{ptworkSelected}}">
-      <view class='tr detail'><text>项目名称：</text><text>{{ptwork.projectName}}</text></view>
-      <view class='tr detail'><text>作业内容：</text><text>{{ptwork.projectWorkNote}}</text></view>
-      <view class='tr detail'><text>委托单位：</text><text>{{ptwork.projectAuthorize}}</text></view>
-      <view class='tr detail'><text>工作小结：</text><text>{{ptwork.briefSummary}}</text></view>
-      <view class='tr detail'><text>委托要求：</text><text>{{ptwork.projectNote}}</text></view>
-      <view class='tr detail'><text>过程检查：</text><text>{{ptwork.checkSuggestion}}</text></view>
-      <view class='tr detail'><text>工作量：</text><text>{{ptwork.workLoad}}</text></view>
-      <view class='tr detail'><text>上交资料：</text><text>{{ptwork.dataName}}</text></view>
-      <view class='tr detail'><text>质量等级：</text><text>{{ptwork.qualityLevel}}</text></view>
-      <view class='tr detail'><text>质量综述：</text><text>{{ptwork.qualityNote}}</text></view>
-      <view class='tr detail'><text>联系人：</text><text>{{ptwork.projectUserName}}</text></view>
-      <view class='tr detail'><text>联系电话：</text><text>{{ptwork.projectPhone}}</text></view>
-      <view class='tr detail'><text>项目启动时间：</text><text>{{ptwork.projectStartTime}}</text></view>
-      <view class='tr detail'><text>项目结束时间：</text><text>{{ptwork.projectEndTime}}</text></view>
+      <view class='tr detail'><text>项目编号：   </text><text>{{ptwork.projectNo}}</text></view>
+      <view class='tr detail'><text>项目名称：   </text><text>{{ptwork.projectName}}</text></view>
+      <view class='tr detail'><text>项目类型：    </text><text>{{ptwork.projectType}}</text></view>
+      <view class='tr detail'><text>工作内容：     </text><text>{{ptwork.workNote}}</text></view>
+      <view class='tr detail'><text>联系人：</text><text>{{ptwork.userName==null?'':ptwork.userName}}</text></view>
+      <view class='tr detail'><text>联系电话：</text><text>{{ptwork.userPhone==null?'':ptwork.userPhone}}</text></view>
       <view class='tr detail'><text>项目负责人：</text><text>{{ptwork.projectCharge}}</text></view>
-      <view class='tr detail'><text>业务负责人：</text><text>{{ptwork.projectBusiness}}</text></view>
+      <view class='tr detail'><text>业务负责人：</text><text>{{ptwork.contractBusiness==null?'':ptwork.contractBusiness}}</text></view>
+      <view class='tr detail'><text>工作内容：</text><text>{{ptwork.workNote}}</text></view>
+      <view class='tr detail'><text>工作要求：</text><text>{{ptwork.workRequire}}</text></view>
+      <view class='tr detail'><text>质量综述：</text><text>{{ptwork.qualityNote}}</text></view>
+      <view class='tr detail'><text>质量评分：</text><text>{{ptwork.qualityScore}}</text></view>
+      <view class='tr detail'><text>质量等级：</text><text>{{ptwork.qualityLevel}}</text></view>
     </view>
   </view>
 </view>
@@ -39,6 +36,5 @@
 
 <view class='tr btnLine'>
   <button class='rtbtn' bindtap='returnEvnet'>返回</button>
-  <button class='savebtn' bindtap='saveEvent'>保存</button>
-  <button class='postbtn' bindtap='postEvent'>审定完成</button>
+  <button class='postbtn' bindtap='postEvent'>提交</button>
 </view>

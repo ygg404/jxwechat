@@ -9,7 +9,7 @@ Page({
    * 页面的初始数据
    */
   data: {
-    urlId: 'projectwork-management',
+    urlId: 'quality-management',
     calendarShow: false,    //日历显示
     setStartflag: false, //设置开始日期标志
     backShow: false,  //返修显示
@@ -392,8 +392,8 @@ Page({
         }
       }
     });
-
   },
+
   /**
    * 返修事件
    */

@@ -43,7 +43,7 @@
                 <view><button class='resbtn' bindtap='checkProjectEvent' id="{{contract.id}}" data-value="{{contract}}">查看项目</button></view>
                   <view><button class='resbtn' bindtap='addProjectEvent' id="{{contract.id}}" data-value="{{contract}}">添加项目</button></view>
                   <view><button class='resbtn' bindtap='editEvent' id="{{contract.id}}">编辑</button></view>
-                <view><button class='delbtn' bindtap='delEvent' id="{{contract.id}}">删除</button></view>
+                <view><button class='resbtn' bindtap='delEvent' id="{{contract.id}}">删除</button></view>
                 <view wx:if="{{contract.fileName!=null}}"><button class='downbtn' bindtap='downloadEvent' id="{{contract.id}}">下载</button></view>
               </view>
           </view>

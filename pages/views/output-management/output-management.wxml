@@ -46,7 +46,8 @@
               <view>
                 <span wx:if='{{project.isOutput == 1}}' class="issetSpan">已核算</span>
                 <span wx:if='{{project.isOutput != 1}}' class="notsetSpan">未核算</span>
-              
+                <span wx:if='{{project.projectStatus === 0}}' class="startSpan">启动</span>
+                 <span wx:if='{{project.projectStatus !== 0}}' class="stopsetSpan">暂停</span>
               </view>
             </view>
             <view class="td td2">{{project.projectName}}</view>

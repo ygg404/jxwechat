@@ -46,12 +46,13 @@
               <view>
                 <span wx:if='{{project.isAuthorize == 1}}' class="issetSpan">已审核</span>
                 <span wx:if='{{project.isAuthorize != 1}}' class="notsetSpan">未审核</span>
-              
+                <span wx:if='{{project.projectStatus === 0}}' class="startSpan">启动</span>
+                 <span wx:if='{{project.projectStatus !== 0}}' class="stopsetSpan">暂停</span>
               </view>
             </view>
             <view class="td td2">{{project.projectName}}</view>
             <view class="td td3">
-              <view><button class='resbtn' id="{{project.id}}" data-value="{{project}}" bindtap='editEvent'>编辑</button></view>
+              <view><button class='resbtn' id="{{project.id}}" data-value="{{project.projectNo}}" bindtap='editClickEvent'>编辑</button></view>
             </view>
         </view>
         <view wx:if="{{project.selected}}">

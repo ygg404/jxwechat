@@ -1,5 +1,5 @@
-// pages/paging/editauthorize/editauthorize.js
 var utils = require('../../../utils/util.js');
+var httpRequest = require('../../../utils/httpRequest.js');
 var app = getApp();
 
 Page({
@@ -9,6 +9,7 @@ Page({
    */
   data: {
     p_no:'',
+    p_id:0,
     ptwork:{},
     ptworkSelected:false,
     examineNote: '' //审定意见
@@ -19,8 +20,10 @@ Page({
    */
   onLoad: function (options) {
     this.setData({
-      p_no: options.p_no
+      p_no: options.p_no,
+      p_id:options.id
     });
+    this.getProjectinfo(options);
   },
 
   /**
@@ -34,7 +37,6 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
-    this.getProjectinfo();
   },
 
   /**
@@ -67,23 +69,23 @@ Page({
   /**
      * 获取项目基本信息
      */
-  getProjectinfo: function () {
-    let that = this;
-    wx.request({
-      url: app.globalData.WebUrl + "project/output/?projectNo=" + that.data.p_no,
-      method: 'GET',
-      header: {
-        'Authorization': "Bearer " + app.globalData.SignToken
-      },
-      success: function (res) {
-        if (res.statusCode == 200) {
-          that.setData({
-            ptwork: res.data,
-            examineNote: res.data.examineNote
-          })
-        }
-      }
-    });
+  getProjectinfo: function (e) {
+    var that = this;
+    return new Promise((resolve, reject) => {
+      httpRequest.requestUrl({
+        url: "project/projectInfo/info/" + this.data.p_no,
+        params: {},
+        method: "get"
+      }).then(data => {
+        that.setData({
+          ptwork: data.projectInfo
+        })
+        that.setData({
+        examineNote: this.data.ptwork.examineNote
+        })
+        resolve(e)
+      })
+    })
   },
   /**
    * 查看项目信息
@@ -111,82 +113,27 @@ Page({
       detla:1
     })
   },
-  /**
-   * 保存
-   */
-  saveEvent: function(e){
-    if (this.data.examineNote == '') {
-      utils.TipModel('错误', '请填写审定意见', 0);
-      return;
-    }
-    let that = this;
-    wx.request({
-      url: app.globalData.WebUrl + "projectSetUp/",
-      method: 'PUT',
-      data:{
-        examineNote: that.data.examineNote,
-        projectNo: that.data.p_no
-      },
-      header: {
-        'Authorization': "Bearer " + app.globalData.SignToken
-      },
-      success: function (res) {
-        if (res.statusCode == 200) {
-          utils.TipModel('提示', res.data.message);
-        }
-      }
-    });
-  },
-  /**
-   * 审定完成
-   */
-  postEvent:function(e){
-    if(this.data.examineNote == ''){
-      utils.TipModel('错误','请填写审定意见',0);
-      return;
-    }
-    let that = this;
-    wx.request({
-      url: app.globalData.WebUrl + "projectSetUp/",
-      method: 'PUT',
-      data: {
-        examineNote: that.data.examineNote,
-        projectNo: that.data.p_no
-      },
-      header: {
-        'Authorization': "Bearer " + app.globalData.SignToken
-      },
-      success: function (res) {
-        if (res.statusCode == 200) {
-          that.postAuthorizeStage();
-        }
-      }
-    });
 
+//提交
+  postEvent:function(e){
+    var that = this;
+    return new Promise((resolve, reject) => {
+      httpRequest.requestUrl({
+        url: "project/project/authorize",
+        params: {
+          id: Number(this.data.p_id),
+          projectNo: that.data.p_no,
+          examineNote: that.data.examineNote
+        },
+        method: "post"
+      }).then(data => {
+        utils.TipModel('提交成功');
+        wx.navigateBack({
+          detla: 1
+        })
+        resolve(e)
+      })
+    })
   },
-  /**
-   * 提交至已审定
-   */
-  postAuthorizeStage:function(){
-    let that = this;
-    wx.request({
-      url: app.globalData.WebUrl + "project/stage/",
-      method: 'post',
-      data: {
-        projectNo: that.data.p_no,
-        projectStage: 9
-      },
-      header: {
-        'Authorization': "Bearer " + app.globalData.SignToken
-      },
-      success: function (res) {
-        if (res.statusCode == 200) {
-          utils.TipModel('提示', res.data.message);
-          wx.navigateBack({
-            detla:1
-          })
-        }
-      }
-    });
-  }
+
 })

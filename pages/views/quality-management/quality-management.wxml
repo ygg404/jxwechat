@@ -45,12 +45,12 @@
               {{project.projectNo==null?'':project.projectNo}}
               <view>
                 <span wx:if='{{project.isCheck == 1}}' class="issetSpan">已质检</span>
-                <span wx:if='{{project.isCheck == 2}}' class="notsetSpan">返修中</span>
+                <span wx:if='{{project.isCheck == 2}}' class="returnSpan">返修中</span>
                 <span wx:if='{{project.isCheck == 3}}' class="issetSpan">返修完成</span>
                 <span wx:if='{{project.isCheck != 1 && project.isCheck != 2 && project.isCheck != 3}}' class="notsetSpan">未质检</span>
 
-                <span wx:if='{{project.projectStatus === 0}}' class="issetSpan">启动</span>
-                 <span wx:if='{{project.projectStatus !== 0}}' class="notsetSpan">暂停</span>
+                <span wx:if='{{project.projectStatus === 0}}' class="startSpan">启动</span>
+                 <span wx:if='{{project.projectStatus !== 0}}' class="stopsetSpan">暂停</span>
               </view>
             </view>
             <view class="td td2">{{project.projectName}}</view>
@@ -83,19 +83,17 @@
         <text style='padding:20rpx;' class='title'>项目返修内容</text>
       </view>
       <view class='tr' >
-          <view class="tdh tdh1">返修日期</view>
-          <view class="tdh tdh2">返修内容</view>
-          <view class="tdh tdh3">提交内容</view>
-          <view class="tdh tdh4"></view>
+          <view class="tdd tdh1">返修日期</view>
+          <view class="tdd tdh2">返修内容</view>
+          <view class="tdd tdh3">提交内容</view>
+          <view class="tdd tdh4"></view>
       </view>
          <view class="tr" wx:for="{{curPro}}" wx:for-item="detail">
             <view class="tdd tdd1">{{detail.backCreateTime}}</view>
             <view class="tdd tdd2">{{detail.backNote}}</view>
             <view class="tdd tdd3">{{detail.note == null?'':detail.note}}</view>
-            <view class="tdd tdd4"><button id='{{detail.id}}' data-value="{{detail.projectNo}}" bindtap='backEditEvent'>编辑</button></view>
          </view>
       <view class="tr" style='margin-top:40rpx;'>
-        <view></view>
         <button bindtap='returnBackEvent' class='backResBtn'>取消</button>
       </view>
     </view>

@@ -76,17 +76,34 @@
   width: 98%;
   margin-left: 1%;
 }
-
 .issetSpan{
   background:green;
   color:white;
-  border-radius:5px;
+  border-radius:3px;
+   margin-left:-5px;
+  margin-right:8px;
 }
 
 .notsetSpan{
-  background:gray;
+  background:rgb(90, 78, 78);
   color:white;
-  border-radius:5px;
+  border-radius:3px;
+   margin-left:-5px;
+  margin-right:8px;
+}
+.stopsetSpan{
+  background:red;
+  color:rgb(255, 255, 255);
+  border-radius:3px;
+  margin-left:5px;
+  margin-right:5px;
+}
+.startSpan{
+  background:rgb(46, 96, 189);
+  color:white;
+  border-radius:3px;
+   margin-left:5px;
+  margin-right:5px;
 }
 
 .tr{

@@ -76,19 +76,42 @@
   width: 98%;
   margin-left: 1%;
 }
-
+.returnSpan{
+  background:red;
+  color:white;
+  border-radius:3px;
+   margin-left:-5px;
+  margin-right:8px;
+}
 .issetSpan{
   background:green;
   color:white;
-  border-radius:5px;
+  border-radius:3px;
+   margin-left:-5px;
+  margin-right:8px;
 }
 
 .notsetSpan{
-  background:gray;
+  background:rgb(90, 78, 78);
   color:white;
-  border-radius:5px;
+  border-radius:3px;
+   margin-left:-5px;
+  margin-right:8px;
 }
-
+.stopsetSpan{
+  background:red;
+  color:rgb(255, 255, 255);
+  border-radius:3px;
+  margin-left:5px;
+  margin-right:5px;
+}
+.startSpan{
+  background:rgb(46, 96, 189);
+  color:white;
+  border-radius:3px;
+   margin-left:5px;
+  margin-right:5px;
+}
 .tr{
   text-align: left;
   width:100%;
@@ -253,7 +276,7 @@
 
 .tr .tdh1{
   border-bottom: 1px solid gray;
-  width: 25%;
+  width: 40%;
 }
 
 .tr .tdh2{

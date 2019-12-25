@@ -1,11 +1,11 @@
 /* pages/paging/editauthorize/editauthorize.wxss */
 .box{
   margin:20rpx;
-  border: 1px solid #dadada
+  border: 1px solid #ece9e9
 }
 .boxinfo{
   margin:20rpx;
-  background: #5f636b;
+  background: #dde0e7;
   color: whitesmoke
 }
 .boxgroup{
@@ -63,7 +63,7 @@
   margin-left: 5%;
   width: 90%;
   font-size: 10pt;
-  color: grey;
+  color: rgb(212, 206, 206);
 }
 
 .spaceAroundCenter image{

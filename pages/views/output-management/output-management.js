@@ -9,7 +9,7 @@ Page({
    * 页面的初始数据
    */
   data: {
-    urlId: 'projectwork-management',
+    urlId: 'output-management',
     calendarShow: false,    //日历显示
     setStartflag: false, //设置开始日期标志
     backShow: false,  //返修显示
@@ -376,6 +376,13 @@ Page({
    */
   editEvent: function (e) {
     var projectInfo = e.currentTarget.dataset.value;
+    if(projectInfo.isOutput != 1){
+      wx.showToast({
+        title: '项目未核算',
+        duration: 3000
+      })
+      return;
+    }
     let projectNo = ''
     for (let project of this.data.tableList) {
       if (project['id'] == e.currentTarget.id) {
