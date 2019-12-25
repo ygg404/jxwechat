@@ -88,17 +88,7 @@
 
             //提交项目编辑表单
             projectFormSubmit: function (e) {
-              //提交错误描述
-              // if (!this.WxValidate.checkForm(e)) {
-              //   const error = this.WxValidate.errorList[0]
-              //   // `${error.param} : ${error.msg} `
-              //   wx.showToast({
-              //     title: `${error.msg} `,
-              //     image: '/images/warn.png',
-              //     duration: 2000
-              //   })
-              //   return false
-              // }
+            
               var that = this;
               var _url = '';
               var passid = '';
@@ -118,7 +108,7 @@
                   projectProduce: that.data.produceName[that.data.produceId],
                   projectNo: that.data.addAndeditprojectno,
                   projectName: e.detail.value.projectName,
-                  projectCreateDateTime: this.data.projectTime,
+                  projectStartDateTime: this.data.projectTime,
                   contractNo: this.data.projectDetail.contractNo,
                   projectMoney: this.data.projectDetail.projectMoney,
                   projectBusiness: this.data.projectDetail.projectBusiness,
@@ -266,8 +256,7 @@
                   titleName: "添加"
                 })
                 that.setData({
-                  projectTime: this.data.contractDetail.contractStartDateTime,
-                  produceId: this.data.produce[0].id
+                  projectTime: this.data.contractDetail.contractStartDateTime
                 })
                 }
                 resolve(showProjectId)
@@ -332,17 +321,19 @@
                 })
               })
             },
-            //请求后台返回需要添加的合同编号
+            //请求后台返回需要添加的项目编号
             getAddProjectNo: function (e) {
               var that = this;
               return new Promise((resolve, reject) => {
                 httpRequest.requestUrl({
-                  url: "project/contract/getMaxContractNo",
-                  params: {},
+                  url: "project/project/getProjectNo",
+                  params: {
+                    contractNo: that.data.titleContractNo
+                  },
                   method: "get"
                 }).then(data => {
                   that.setData({
-                    addAndeditprojectno: data.contractNo
+                    addAndeditprojectno: data.projectNo
                   })
                   resolve(e)
                 })

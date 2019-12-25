@@ -26,7 +26,7 @@
         <view wx:if="{{project.selected}}">
           <view class='tr detail'><text>业务负责人：</text><text>{{project.projectBusiness}}</text></view>
         <view class='tr detail'><text>生产负责人：</text><text>{{project.projectProduce}}</text></view>
-          <view class='tr detail'><text>项目启动时间：</text><text>{{project.projectCreateDateTime}}</text></view>
+          <view class='tr detail'><text>项目启动时间：</text><text>{{project.projectStartDateTime}}</text></view>
           <view class='tr detail'><text>项目类型：</text><text>{{project.projectType}}</text></view>
         </view>
       </view>
