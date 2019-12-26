@@ -671,10 +671,13 @@ Page({
     console.log(this.data.workGroupsList)
     for(let group of this.data.workGroupsList){
       if(group['checked']){
+        if (group['projectOutput'] != null && group['outputRate'] != null ){
         totalOutput += parseFloat(group['projectOutput']);
         totalrate += parseFloat(group['outputRate']);
+        }
       }
     }
+    console.log(totalOutput)
     if (totalrate > 100.01 || totalrate<99.99){
       utils.TipModel('错误','产值占比不满足100%', 0);
       return;
