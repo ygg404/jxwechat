@@ -411,7 +411,7 @@
           })
           wx.uploadFile({
             //路径
-            url: app.globalData.upContractUrl,
+            url: app.globalData.WebUrl + '/project/contract/upContractFile/',
             filePath: tempFilePaths[0],
             //头信息
             header:header,

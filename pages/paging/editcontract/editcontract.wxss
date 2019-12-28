@@ -305,3 +305,11 @@
   width: 100%;
 }
 
+.filename_view{
+  width: 100%;
+  color: gray;
+  font-size: 10pt;
+  word-break:break-all;
+  line-height: 100%;
+}
+
