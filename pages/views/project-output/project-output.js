@@ -17,7 +17,7 @@ Page({
     pagination: {
       'page': 1,
       'rowsPerPage': 10,
-      'sortBy': 'id',
+      'sidx': 'id',
       'startDate': '', //开始日期
       'endDate': '',// 结束日期
       'search': '',
@@ -122,7 +122,7 @@ Page({
       data: {
         page: pagination.page,
         rowsPerPage: pagination.rowsPerPage,
-        sortBy: pagination.sortBy,
+        sidx: pagination.sortBy,
         descending: pagination.descending,
         search: pagination.search,
         startDate: pagination.startDate,

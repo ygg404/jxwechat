@@ -18,15 +18,14 @@ Page({
     projectTypes: [],  //阶段选择
     projectTypeID: 0,
     pagination: {
-      'page': 1,
-      'rowsPerPage': 10,
-      'sortBy': 'id',
-      'startDate': utils.getLastMonthDate(), //开始日期
-      'endDate': utils.formatDate(new Date()),// 结束日期
-      'search': '',
-      'p_stage': 1,
-      'descending': true,
-      'stageId': 3
+      page: 1,
+      rowsPerPage: 10,
+      sidx: 'id',
+      startDate: utils.getLastMonthDate(), //开始日期
+      endDate: utils.formatDate(new Date()),// 结束日期
+      search: '',
+      p_stage: 1,
+      descending: true
     },  //分页参数
     has_next: false,  //是否有上下页
     has_pre: false,
