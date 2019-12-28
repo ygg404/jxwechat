@@ -34,7 +34,7 @@
             <view class="td td1" bindtap='detailClickEvent' id="{{project.id}}">{{project.contractNo==null?'':project.projectNo}}</view>
             <view class="td td2">{{project.projectName}}</view>
             <view class="td td3">
-              <view><button class='delbtn' bindtap='deleteEvent' id="{{project.projectNo}}">彻底删除</button></view>
+              <view><button class='resbtn' bindtap='deleteEvent' id="{{project.projectNo}}">彻底删除</button></view>
               <view><button class='resbtn' bindtap='restoreEvent' data-value="{{project.projectNo}}" id="{{project.id}}">恢复</button></view>
             </view>
         </view>

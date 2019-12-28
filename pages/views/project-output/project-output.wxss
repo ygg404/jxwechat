@@ -29,7 +29,8 @@
   height: 70rpx;
   text-align: left;
   align-items: center;
-  border-bottom:1px solid rgb(40, 133, 4)
+  border-bottom:1px solid rgb(40, 133, 4);
+  display:none;
 }
 
 .spaceAroundCenter .searchview{

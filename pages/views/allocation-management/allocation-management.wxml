@@ -16,7 +16,7 @@
     </view>
   </view>
   <view class='spaceAroundCenter' >
-     <view class='searchview'>
+     <view class='searchview' style="display:none">
       <picker bindchange="ProTypeChangeEvent"   value="{{projectTypeID}}" range="{{projectTypes}}">
         <view style='width:200%;'>
           {{projectTypes[projectTypeID]}}
@@ -26,7 +26,7 @@
       <image src='/images/down.png'></image>
     </view>
     <view class='searchview' style='margin-left:20rpx;'>
-      <input class='inputsearch' placeholder='关键词搜索' bindinput="searchInputEvent" value='{{pagination.search}}'></input>
+      <input class='inputsearch'  placeholder='关键词搜索' bindinput="searchInputEvent" value='{{pagination.search}}'></input>
       <icon type='search' style='margin-left:-32px;margin-top:15rpx;'></icon>
     </view>
 

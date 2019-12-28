@@ -22,6 +22,7 @@
       businessId:0, //业务负责人
       contracttypeId:0,//合同类型
       projectType:0,//项目类型
+      filename:''//上传的文件名
     },
 
     /**
@@ -55,6 +56,7 @@
      
       
     },
+   
     /**
         * 表单验证的初始化函数
         */
@@ -62,24 +64,38 @@
       this.WxValidate = app.wxValidate(
         {
           contractName: {
-            required: '请填写合同名称',
+            required: true,
+          },
+          projectType:{
+            required: true,   
+          },
+          contractMoney: {
+            required: true,
+            number:true
+          }, 
+          contractUserPhone: {
+            minlength: 11,
+            maxlength: 15,
+          },
+          contractTime:{
+            required: true,
+            dateISO:true
+          }  
+        }
+        , {
+          contractName: {
+            required: '请输入合同名称',
+          },
+          projectType: {
+            required: '请输入项目类型',
           },
           contractMoney: {
             required: '请填写合同金额',
           },
-          contractAuthorize: {
-            required: '请填写委托单位',
-          },
-          contractNote: {
-            required: '请填写委托要求',
-          },
-          contractUserName: {
-            required: '请填写联系人',
-          },
-          contractUserPhone: {
-            required: '请填写联系人电话',
+          contractTime: {
+            required: '请输入签订时间',
           }
-        } 
+        }
       )
     },
 
@@ -152,6 +168,7 @@
         })
         return false
       }
+   
       var that = this;
       var _url = '';
       if (that.data.pageTitleName == '添加') {
@@ -174,7 +191,9 @@
           userPhone: this.data.contractDetail.userPhone,
           projectType: e.detail.value.projectType,
           //合同类型
-          contractType: that.data.contracttypeId
+          contractType: that.data.contracttypeId,
+          //上传的文件名
+          filename: that.data.filename
         },
         method: "post"
       }).then(data => {
@@ -365,6 +384,62 @@
         })
           resolve(e)
         })
+      })
+    },
+
+    //选择文件按钮点击事件
+    chooseFile: function (e) {
+      var that = this;
+      var header = '';
+      //设置传输协议头部信息
+      let sessionId = wx.getStorageSync("sid");
+      if (sessionId != "" && sessionId != null) {
+         header = { 'Cookie': 'sid=' + sessionId, 'token': app.globalData.token }
+      } else {
+         header = { 'token': app.globalData.token }
+      }
+      wx.chooseImage({
+        count: 1, // 默认9
+        success: function (res) {
+          // 返回选定照片的本地文件路径列表，tempFilePath可以作为img标签的src属性显示图片
+          var tempFilePaths = res.tempFilePaths;
+          wx.showToast({
+            title: '正在上传...',
+            icon: 'loading',
+            mask: true,
+            duration: 2000
+          })
+          wx.uploadFile({
+            //路径
+            url: app.globalData.upContractUrl,
+            filePath: tempFilePaths[0],
+            //头信息
+            header:header,
+            name: 'file',
+            formData: {
+              'contractNo': that.data.contractDetail.contractNo
+            },
+            success: function (res) {
+              if (res.statusCode == 200) {
+                wx.showToast({
+                  title: '上传成功!',
+                });
+                //接受文件名
+                var last = JSON.parse(res.data);
+                var filename = last.fileName;
+                that.setData({
+                  filename:filename
+                })
+              } else {
+                wx.showToast({
+                  title: '上传失败',
+                  image: '/images/warn.png',
+                  duration: 2000
+                })
+              }
+            }
+          })
+        }
       })
     },
 

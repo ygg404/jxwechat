@@ -16,7 +16,7 @@
     </view>
   </view>
   <view class='spaceAroundCenter' >
-     <view class='searchview'>
+     <view class='searchview' style="display:none">
       <picker bindchange="ProTypeChangeEvent"   value="{{projectTypeID}}" range="{{projectTypes}}">
         <view style='width:200%;'>
           {{projectTypes[projectTypeID]}}
