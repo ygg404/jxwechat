@@ -20,7 +20,7 @@ Page({
     pagination: {
       'page': 1,
       'rowsPerPage': 10,
-      'sortBy': 'id',
+      'sidx': 'id',
       'startDate': utils.getLastMonthDate(), //开始日期
       'endDate': utils.formatDate(new Date()),// 结束日期
       'search': '',

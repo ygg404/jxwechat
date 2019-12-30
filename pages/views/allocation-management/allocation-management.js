@@ -16,15 +16,15 @@ Page({
     projectTypeID: 0,
     dateInfo: '',
     pagination: {
-      'page': 1,
-      'rowsPerPage': 10,
-      'sidx': 'id',
-      'startDate': utils.getLastMonthDate(), //开始日期
-      'endDate': utils.formatDate(new Date()),// 结束日期
-      'search': '',
-      'p_stage': 1,
-      'stageId':2,
-      'descending': true
+      page: 1,
+      rowsPerPage: 10,
+      sidx: 'id',
+      startDate: utils.getLastMonthDate(), //开始日期
+      endDate: utils.formatDate(new Date()),// 结束日期
+      search: '',
+      p_stage: 1,
+      stageId:2,
+      descending: true
     },  //分页参数
     has_next: false,  //是否有上下页
     has_pre: false,

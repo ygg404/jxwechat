@@ -426,9 +426,10 @@
                 });
                 //接受文件名
                 var last = JSON.parse(res.data);
-                var filename = last.fileName;
+                let contractDetail = that.data.contractDetail
+                contractDetail.fileName = last.fileName;
                 that.setData({
-                  filename:filename
+                  contractDetail: contractDetail
                 })
               } else {
                 wx.showToast({

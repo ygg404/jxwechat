@@ -38,6 +38,7 @@ App({
   },
   globalData: {
     userInfo: null,
+    // WebUrl: 'https://www.gdjxch.cn/htsys/',
     WebUrl: 'http://localhost:19433/htsys/',
     upContractUrl: 'http://192.168.0.171:8002/jx/api/file/',  //后台上传合同路径
     downContractUrl: 'http://192.168.0.170:8002/jx/api/download/?contractNo=', //合同下载接口

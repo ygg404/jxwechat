@@ -20,16 +20,13 @@ function firstLoad(){
   if(permissionsList.indexOf('project_contract') != -1){
     return 'contract-management'
   }
-  if(permissionsList.indexOf('put_project') != -1){
-    return 'projectsetup-management'
-  }
   if(permissionsList.indexOf('make_project') != -1){
     return 'allocation-management'
   }
-  if(permissionsList.indexOf('start_project') != -1){
+  if (permissionsList.indexOf('project:work:list') != -1){
     return 'projectwork-management'
   }
-  if(permissionsList.indexOf('inspect_quality') != -1){
+  if (permissionsList.indexOf('project:quality:list') != -1){
     return 'quality-management'
   }
   if(permissionsList.indexOf('adjust_output') != -1){
@@ -41,10 +38,10 @@ function firstLoad(){
   if(permissionsList.indexOf('authorized') != -1){
     return 'audited-management'
   }
-  if (permissionsList.indexOf('output_chart') != -1) {
+  if (permissionsList.indexOf('project:chartoutput') != -1) {
     return 'output-chart'
   }
-  if (permissionsList.indexOf('all_output_chart') != -1) {
+  if (permissionsList.indexOf('project:chartcollect') != -1) {
     return 'collect-chart'
   }
   if (permissionsList.indexOf('all_business') != -1) {
