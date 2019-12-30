@@ -457,6 +457,10 @@ Page({
         },
         method: "post"
       }).then(data => {
+        if(data.code == 500){
+          utils.TipModel('提示', data.msg);
+          return;
+        }
         utils.TipModel('提示', "修改作业状态成功");
         this.getProjectsFromApi();
         resolve(e)
