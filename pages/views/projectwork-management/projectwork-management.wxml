@@ -96,8 +96,8 @@
          <view class="tr" wx:for="{{curPro}}" wx:for-item="detail">
             <view class="tdd tdd1">{{detail.backCreateTime}}</view>
             <view class="tdd tdd2">{{detail.backNote}}</view>
-            <view class="tdd tdd3">{{detail.note == null?'':detail.note}}</view>
-            <view class="tdd tdd4"><button id='{{detail.id}}' data-value="{{detail.projectNo}}" bindtap='backEditEvent'>编辑</button></view>
+            <view class="tdd tdd3">{{detail.submitNote == null?'':detail.submitNote}}</view>
+            <view class="tdd tdd4"><button wx-if="{{detail.submitNote == null}}" id='{{detail.id}}' data-value="{{detail.projectNo}}" bindtap='backEditEvent'>编辑</button></view>
          </view>
       <view class="tr" style='margin-top:40rpx;'>
         <view></view>
