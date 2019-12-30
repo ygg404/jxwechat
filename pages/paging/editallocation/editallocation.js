@@ -558,7 +558,7 @@ Page({
       url: "/project/plan/save",
       params: {
         'id': pDetail.id || undefined,
-        'projectNo': pDetail.projectNo,
+        'projectNo': that.data.p_no,
         'projectWorkload': pDetail.projectWorkload,
         'projectWorkDate': pDetail.projectWorkDate,
         'projectQualityDate': pDetail.projectQualityDate,
@@ -703,8 +703,11 @@ Page({
       },
       method: "post"
     }).then(data => {
+      let plan = that.data.projectPlan;
+      plan.projectCharge = that.data.headManList[that.data.headManIndex]
       that.setData({
-        workGroupShow: false
+        workGroupShow: false,
+        projectPlan: plan
       })
       that.getWorkGroups()
     })
