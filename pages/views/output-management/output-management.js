@@ -376,13 +376,13 @@ Page({
    */
   editEvent: function (e) {
     var projectInfo = e.currentTarget.dataset.value;
-    if(projectInfo.isOutput != 1){
-      wx.showToast({
-        title: '项目未核算',
-        duration: 3000
-      })
-      return;
-    }
+    // if(projectInfo.isOutput != 1){
+    //   wx.showToast({
+    //     title: '项目未核算',
+    //     duration: 3000
+    //   })
+    //   return;
+    // }
     let projectNo = ''
     for (let project of this.data.tableList) {
       if (project['id'] == e.currentTarget.id) {
